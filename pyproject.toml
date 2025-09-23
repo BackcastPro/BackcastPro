@@ -1,0 +1,25 @@
+[project]
+name = "BackcastPro"
+version = "0.0.1"
+authors = [
+  { name="笹澤ようすけ", email="yosuke.sasazawa@gmail.com" },
+]
+description = "A small example package"
+readme = "README.md"
+requires-python = ">=3.9"
+classifiers = [
+    "Programming Language :: Python :: 3",
+    "Operating System :: OS Independent",
+    "License :: OSI Approved :: MIT License",
+]
+
+[project.urls]
+Homepage = "https://BackcastPro.github.io/BackcastPro/"
+Issues = "https://github.com/BackcastPro/BackcastPro/issues"
+
+[tool.setuptools]
+include-package-data = true
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
