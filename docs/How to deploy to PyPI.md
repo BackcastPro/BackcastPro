@@ -14,7 +14,7 @@ python -m build
 
 Finally, it’s time to upload your package to the Python Package Index!
 ```
-python -m twine upload --repository testpypi dist/*
+python -m twine upload --repository pypi dist/*
 ```
 
 You will be prompted for an API [token](https://pypi.org/manage/account/#api-tokens). Use the token value, including the pypi- prefix. Note that the input will be hidden, so be sure to paste correctly.
