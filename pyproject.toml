@@ -16,6 +16,7 @@ classifiers = [
 [project.urls]
 Homepage = "https://BackcastPro.github.io/BackcastPro/"
 Issues = "https://github.com/BackcastPro/BackcastPro/issues"
+Logo = "https://raw.githubusercontent.com/BackcastPro/BackcastPro/main/docs/img/2.png"
 
 [tool.setuptools]
 include-package-data = true
