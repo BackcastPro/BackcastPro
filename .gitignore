@@ -1,6 +1,11 @@
 __pycache__
 .pytest_cache
 .env
+
 .pypirc
-dist/
-src/BackcastPro.egg-info/
+*.egg-info
+.eggs/*
+__pycache__/*
+dist/*
+
+*.html
