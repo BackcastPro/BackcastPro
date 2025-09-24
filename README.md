@@ -37,3 +37,12 @@ from BackcastPro.lib import resample_apply
 
 - [How to deploy to PyPI](./docs/How%20to%20deploy%20to%20PyPI.md)
 - [Examples](./docs/examples/)
+
+## Bugs
+
+Before reporting bugs or posting to the
+[discussion board](https://discord.gg/fzJTbpzE),
+please read [contributing guidelines](CONTRIBUTING.md), particularly the section
+about crafting useful bug reports and ```` ``` ````-fencing your code. We thank you!
+
+
