@@ -35,6 +35,17 @@
 
 # %%
 import pandas as pd
+import multiprocessing
+import warnings
+
+# 警告を抑制（開発・テスト用）
+warnings.filterwarnings('ignore', message='Some trades remain open at the end of backtest')
+warnings.filterwarnings('ignore', category=UserWarning)
+warnings.filterwarnings('ignore', category=RuntimeWarning)
+
+# Windows環境でのマルチプロセッシング設定
+if __name__ == '__main__':
+    multiprocessing.set_start_method('spawn', force=True)
 
 
 def SMA(array, n):
@@ -119,7 +130,7 @@ class System(Strategy):
 # %%
 from BackcastPro.test import GOOG
 
-backtest = Backtest(GOOG, System, commission=.002)
+backtest = Backtest(GOOG, System, commission=.002, finalize_trades=True)
 backtest.run()
 
 # %% [markdown]
@@ -128,9 +139,12 @@ backtest.run()
 # %%
 # %%time
 
-backtest.optimize(d_rsi=range(10, 35, 5),
-                  w_rsi=range(10, 35, 5),
-                  level=range(30, 80, 10))
+if __name__ == '__main__':
+    # パラメータ範囲を小さくしてテスト実行
+    backtest.optimize(d_rsi=range(25, 35, 10),
+                      w_rsi=range(25, 35, 10),
+                      level=range(60, 80, 20),
+                      finalize_trades=True)
 
 # %%
 backtest.plot()
