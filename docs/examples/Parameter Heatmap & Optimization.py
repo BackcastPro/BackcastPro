@@ -162,7 +162,7 @@ _ = (
 
 # %% [markdown]
 # We see that, on average, we obtain the highest result using trend-determining parameters `n1=30` and `n2=100` or `n1=70` and `n2=80`,
-# and it's not like other nearby combinations work similarly well — for our particular strategy, these combinations really stand out.
+# and it's not like other nearby combinations work similarly well  Efor our particular strategy, these combinations really stand out.
 #
 # Since our strategy contains several parameters, we might be interested in other relationships between their values.
 # We can use
@@ -195,18 +195,18 @@ plot_heatmaps(heatmap, agg='mean')
 # %%
 # #%%time
 
-stats, heatmap, optimize_result = backtest.optimize(
-    n1=[10, 100],      # Note: For method="sambo", we
-    n2=[20, 200],      # only need interval end-points
-    n_enter=[10, 40],
-    n_exit=[10, 30],
-    constraint=lambda p: p.n_exit < p.n_enter < p.n1 < p.n2,
-    maximize='Equity Final [$]',
-    method='sambo',
-    max_tries=40,
-    random_state=0,
-    return_heatmap=True,
-    return_optimization=True)
+# stats, heatmap, optimize_result = backtest.optimize(
+#    n1=[10, 100],      # Note: For method="sambo", we
+#    n2=[20, 200],      # only need interval end-points
+#    n_enter=[10, 40],
+#    n_exit=[10, 30],
+#    constraint=lambda p: p.n_exit < p.n_enter < p.n1 < p.n2,
+#    maximize='Equity Final [$]',
+#    method='sambo',
+#    max_tries=40,
+#    random_state=0,
+#    return_heatmap=True,
+#    return_optimization=True)
 
 # %%
 heatmap.sort_values().iloc[-3:]
@@ -224,15 +224,15 @@ heatmap.sort_values().iloc[-3:]
 # Note, because SAMBO internally only does _minimization_, the values in `optimize_result` are negated (less is better).
 
 # %%
-from sambo.plot import plot_objective
+#from sambo.plot import plot_objective
 
-names = ['n1', 'n2', 'n_enter', 'n_exit']
-_ = plot_objective(optimize_result, names=names, estimator='et')
+#names = ['n1', 'n2', 'n_enter', 'n_exit']
+#_ = plot_objective(optimize_result, names=names, estimator='et')
 
 # %%
-from sambo.plot import plot_evaluations
+#from sambo.plot import plot_evaluations
 
-_ = plot_evaluations(optimize_result, names=names)
+#_ = plot_evaluations(optimize_result, names=names)
 
 # %% [markdown]
 # Learn more by exploring further
