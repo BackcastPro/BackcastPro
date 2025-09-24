@@ -20,9 +20,9 @@ cd BackcastPro
 pip install -e .
 ```
 
-**開発モードインストール（pip install -e .）を行う**
-- 先ほど実行したpip install -e .により、プロジェクトが開発モードでインストールされています
-- これにより、srcディレクトリが自動的にPythonパスに追加されました
+**Development Mode Installation (pip install -e .)**
+- The pip install -e . command executed above has installed the project in development mode
+- This automatically adds the src directory to the Python path
 
 ## Usage
 
@@ -42,7 +42,5 @@ from BackcastPro.lib import resample_apply
 
 Before reporting bugs or posting to the
 [discussion board](https://discord.gg/fzJTbpzE),
-please read [contributing guidelines](CONTRIBUTING.md), particularly the section
-about crafting useful bug reports and ```` ``` ````-fencing your code. We thank you!
 
 

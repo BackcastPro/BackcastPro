@@ -2,7 +2,7 @@
 name = "BackcastPro"
 version = "0.0.2"
 authors = [
-  { name="笹澤ようすけ", email="yosuke.sasazawa@gmail.com" },
+  { name="botterYosuke", email="yosuke.sasazawa@gmail.com" },
 ]
 description = "A small example package"
 readme = "README.md"
@@ -16,7 +16,7 @@ classifiers = [
 [project.urls]
 Homepage = "https://BackcastPro.github.io/BackcastPro/"
 Issues = "https://github.com/BackcastPro/BackcastPro/issues"
-Logo = "https://raw.githubusercontent.com/BackcastPro/BackcastPro/main/docs/img/2.png"
+Logo = "https://raw.githubusercontent.com/BackcastPro/BackcastPro/main/docs/img/logo.png"
 
 [tool.setuptools]
 include-package-data = true
