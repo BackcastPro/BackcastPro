@@ -56,42 +56,40 @@ class Trade:
 
     @property
     def size(self):
-        """Trade size (volume; negative for short trades)."""
+        """取引サイズ（ボリューム；ショート取引の場合は負の値）。"""
         return self.__size
 
     @property
     def entry_price(self) -> float:
-        """Trade entry price."""
+        """取引エントリー価格。"""
         return self.__entry_price
 
     @property
     def exit_price(self) -> Optional[float]:
-        """Trade exit price (or None if the trade is still active)."""
+        """取引エグジット価格（取引がまだアクティブな場合はNone）。"""
         return self.__exit_price
 
     @property
     def entry_bar(self) -> int:
-        """Candlestick bar index of when the trade was entered."""
+        """取引がエントリーされた時のローソク足バーのインデックス。"""
         return self.__entry_bar
 
     @property
     def exit_bar(self) -> Optional[int]:
         """
-        Candlestick bar index of when the trade was exited
-        (or None if the trade is still active).
+        取引がエグジットされた時のローソク足バーのインデックス
+        （取引がまだアクティブな場合はNone）。
         """
         return self.__exit_bar
 
     @property
     def tag(self):
         """
-        A tag value inherited from the `Order` that opened
-        this trade.
+        この取引を開始した`Order`から継承されたタグ値。
 
-        This can be used to track trades and apply conditional
-        logic / subgroup analysis.
+        取引の追跡や条件付きロジック/サブグループ分析に使用できます。
 
-        See also `Order.tag`.
+        `Order.tag`も参照してください。
         """
         return self.__tag
 
@@ -107,48 +105,48 @@ class Trade:
 
     @property
     def entry_time(self) -> Union[pd.Timestamp, int]:
-        """Datetime of when the trade was entered."""
+        """取引がエントリーされた日時。"""
         return self.__broker._data.index[self.__entry_bar]
 
     @property
     def exit_time(self) -> Optional[Union[pd.Timestamp, int]]:
-        """Datetime of when the trade was exited."""
+        """取引がエグジットされた日時。"""
         if self.__exit_bar is None:
             return None
         return self.__broker._data.index[self.__exit_bar]
 
     @property
     def is_long(self):
-        """True if the trade is long (trade size is positive)."""
+        """取引がロングの場合True（取引サイズが正の値）。"""
         return self.__size > 0
 
     @property
     def is_short(self):
-        """True if the trade is short (trade size is negative)."""
+        """取引がショートの場合True（取引サイズが負の値）。"""
         return not self.is_long
 
     @property
     def pl(self):
         """
-        Trade profit (positive) or loss (negative) in cash units.
-        Commissions are reflected only after the Trade is closed.
+        取引の利益（正の値）または損失（負の値）を現金単位で表示。
+        手数料は取引がクローズされた後にのみ反映されます。
         """
         price = self.__exit_price or self.__broker.last_price
         return (self.__size * (price - self.__entry_price)) - self._commissions
 
     @property
     def pl_pct(self):
-        """Trade profit (positive) or loss (negative) in percent."""
+        """取引の利益（正の値）または損失（負の値）をパーセントで表示。"""
         price = self.__exit_price or self.__broker.last_price
         gross_pl_pct = copysign(1, self.__size) * (price / self.__entry_price - 1)
 
-        # Total commission across the entire trade size to individual units
+        # 取引全体のサイズに対する手数料を個別単位に換算
         commission_pct = self._commissions / (abs(self.__size) * self.__entry_price)
         return gross_pl_pct - commission_pct
 
     @property
     def value(self):
-        """Trade total value in cash (volume × price)."""
+        """取引の総価値を現金単位で表示（ボリューム × 価格）。"""
         price = self.__exit_price or self.__broker.last_price
         return abs(self.__size) * price
 
@@ -157,11 +155,11 @@ class Trade:
     @property
     def sl(self):
         """
-        Stop-loss price at which to close the trade.
+        取引をクローズするストップロス価格。
 
-        This variable is writable. By assigning it a new price value,
-        you create or modify the existing SL order.
-        By assigning it `None`, you cancel it.
+        この変数は書き込み可能です。新しい価格値を割り当てることで、
+        既存のSLオーダーを作成または修正します。
+        `None`を割り当てることでキャンセルできます。
         """
         return self.__sl_order and self.__sl_order.stop
 
@@ -172,11 +170,11 @@ class Trade:
     @property
     def tp(self):
         """
-        Take-profit price at which to close the trade.
+        取引をクローズするテイクプロフィット価格。
 
-        This property is writable. By assigning it a new price value,
-        you create or modify the existing TP order.
-        By assigning it `None`, you cancel it.
+        このプロパティは書き込み可能です。新しい価格値を割り当てることで、
+        既存のTPオーダーを作成または修正します。
+        `None`を割り当てることでキャンセルできます。
         """
         return self.__tp_order and self.__tp_order.limit
 

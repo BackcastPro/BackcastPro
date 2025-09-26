@@ -47,21 +47,9 @@ class Order:
             setattr(self, f'_{self.__class__.__qualname__}__{k}', v)
         return self
 
-    def __repr__(self):
-        from ._util import try_
-        return '<Order {}>'.format(', '.join(f'{param}={try_(lambda: round(value, 5), value)!r}'
-                                             for param, value in (
-                                                 ('size', self.__size),
-                                                 ('limit', self.__limit_price),
-                                                 ('stop', self.__stop_price),
-                                                 ('sl', self.__sl_price),
-                                                 ('tp', self.__tp_price),
-                                                 ('contingent', self.is_contingent),
-                                                 ('tag', self.__tag),
-                                             ) if value is not None))  # noqa: E126
 
     def cancel(self):
-        """Cancel the order."""
+        """注文をキャンセルします。"""
         self.__broker.orders.remove(self)
         trade = self.__parent_trade
         if trade:
@@ -77,19 +65,18 @@ class Order:
     @property
     def size(self) -> float:
         """
-        Order size (negative for short orders).
+        注文サイズ（ショート注文の場合は負の値）。
 
-        If size is a value between 0 and 1, it is interpreted as a fraction of current
-        available liquidity (cash plus `Position.pl` minus used margin).
-        A value greater than or equal to 1 indicates an absolute number of units.
+        サイズが0と1の間の値の場合、現在利用可能な流動性（現金 + `Position.pl` - 使用済みマージン）の
+        割合として解釈されます。
+        1以上の値は絶対的なユニット数を示します。
         """
         return self.__size
 
     @property
     def limit(self) -> Optional[float]:
         """
-        Order limit price for [limit orders], or None for [market orders],
-        which are filled at next available price.
+        [指値注文]の注文指値価格、または[成行注文]の場合はNone（次に利用可能な価格で約定）。
 
         [limit orders]: https://www.investopedia.com/terms/l/limitorder.asp
         [market orders]: https://www.investopedia.com/terms/m/marketorder.asp
@@ -99,8 +86,8 @@ class Order:
     @property
     def stop(self) -> Optional[float]:
         """
-        Order stop price for [stop-limit/stop-market][_] order,
-        otherwise None if no stop was set, or the stop price has already been hit.
+        [ストップリミット/ストップ成行]注文の注文ストップ価格。
+        ストップが設定されていない場合、またはストップ価格が既にヒットした場合はNone。
 
         [_]: https://www.investopedia.com/terms/s/stoporder.asp
         """
@@ -109,18 +96,18 @@ class Order:
     @property
     def sl(self) -> Optional[float]:
         """
-        A stop-loss price at which, if set, a new contingent stop-market order
-        will be placed upon the `Trade` following this order's execution.
-        See also `Trade.sl`.
+        ストップロス価格。設定されている場合、この注文の実行後に`Trade`に対して
+        新しい条件付きストップ成行注文が配置されます。
+        `Trade.sl`も参照してください。
         """
         return self.__sl_price
 
     @property
     def tp(self) -> Optional[float]:
         """
-        A take-profit price at which, if set, a new contingent limit order
-        will be placed upon the `Trade` following this order's execution.
-        See also `Trade.tp`.
+        テイクプロフィット価格。設定されている場合、この注文の実行後に`Trade`に対して
+        新しい条件付き指値注文が配置されます。
+        `Trade.tp`も参照してください。
         """
         return self.__tp_price
 
@@ -131,8 +118,8 @@ class Order:
     @property
     def tag(self):
         """
-        Arbitrary value (such as a string) which, if set, enables tracking
-        of this order and the associated `Trade` (see `Trade.tag`).
+        任意の値（文字列など）。設定されている場合、この注文と関連する`Trade`の
+        追跡が可能になります（`Trade.tag`を参照）。
         """
         return self.__tag
 
@@ -142,22 +129,22 @@ class Order:
 
     @property
     def is_long(self):
-        """True if the order is long (order size is positive)."""
+        """注文がロングの場合（注文サイズが正）にTrueを返します。"""
         return self.__size > 0
 
     @property
     def is_short(self):
-        """True if the order is short (order size is negative)."""
+        """注文がショートの場合（注文サイズが負）にTrueを返します。"""
         return self.__size < 0
 
     @property
     def is_contingent(self):
         """
-        True for [contingent] orders, i.e. [OCO] stop-loss and take-profit bracket orders
-        placed upon an active trade. Remaining contingent orders are canceled when
-        their parent `Trade` is closed.
+        [条件付き]注文、つまりアクティブな取引に配置された[OCO]ストップロスおよび
+        テイクプロフィットブラケット注文の場合にTrueを返します。
+        親`Trade`がクローズされると、残りの条件付き注文はキャンセルされます。
 
-        You can modify contingent orders through `Trade.sl` and `Trade.tp`.
+        `Trade.sl`と`Trade.tp`を通じて条件付き注文を変更できます。
 
         [contingent]: https://www.investopedia.com/terms/c/contingentorder.asp
         [OCO]: https://www.investopedia.com/terms/o/oco.asp

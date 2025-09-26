@@ -52,7 +52,7 @@ class Position:
 
     def close(self, portion: float = 1.):
         """
-        Close portion of position by closing `portion` of each active trade. See `Trade.close`.
+        各アクティブな取引の「一部」を決済することで、ポジションの一部を決済します。詳細は「Trade.close」を参照してください。
         """
         for trade in self.__broker.trades:
             trade.close(portion)

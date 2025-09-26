@@ -5,11 +5,11 @@ from typing import TYPE_CHECKING, List, Union, cast
 import numpy as np
 import pandas as pd
 
-from ._util import _data_period, _indicator_warmup_nbars
+from ._util import _data_period
 
 if TYPE_CHECKING:
-    from .strategy import Strategy, Trade
-
+   from .strategy import Strategy
+   from .trade import Trade
 
 def compute_drawdown_duration_peaks(dd: pd.Series):
     iloc = np.unique(np.r_[(dd == 0).values.nonzero()[0], len(dd) - 1])
@@ -75,15 +75,6 @@ def compute_stats(
         trades_df['Duration'] = trades_df['ExitTime'] - trades_df['EntryTime']
         trades_df['Tag'] = [t.tag for t in trades]
 
-        # Add indicator values
-        if len(trades_df) and strategy_instance:
-            for ind in strategy_instance._indicators:
-                ind = np.atleast_2d(ind)
-                for i, values in enumerate(ind):  # multi-d indicators
-                    suffix = f'_{i}' if len(ind) > 1 else ''
-                    trades_df[f'Entry_{ind.name}{suffix}'] = values[trades_df['EntryBar'].values]
-                    trades_df[f'Exit_{ind.name}{suffix}'] = values[trades_df['ExitBar'].values]
-
         commissions = sum(t._commissions for t in trades)
     del trades
 
@@ -112,9 +103,6 @@ def compute_stats(
     if commissions:
         s.loc['Commissions [$]'] = commissions
     s.loc['Return [%]'] = (equity[-1] - equity[0]) / equity[0] * 100
-    first_trading_bar = _indicator_warmup_nbars(strategy_instance)
-    c = ohlc_data.Close.values
-    s.loc['Buy & Hold Return [%]'] = (c[-1] - c[first_trading_bar]) / c[first_trading_bar] * 100  # long-only return
 
     gmean_day_return: float = 0
     day_returns = np.array(np.nan)
@@ -153,16 +141,6 @@ def compute_stats(
         s.loc['Sortino Ratio'] = (annualized_return - risk_free_rate) / (np.sqrt(np.mean(day_returns.clip(-np.inf, 0)**2)) * np.sqrt(annual_trading_days))  # noqa: E501
     max_dd = -np.nan_to_num(dd.max())
     s.loc['Calmar Ratio'] = annualized_return / (-max_dd or np.nan)
-    equity_log_returns = np.log(equity[1:] / equity[:-1])
-    market_log_returns = np.log(c[1:] / c[:-1])
-    beta = np.nan
-    if len(equity_log_returns) > 1 and len(market_log_returns) > 1:
-        # len == 0 on dummy call `stats_keys = compute_stats(...)` pre optimization
-        cov_matrix = np.cov(equity_log_returns, market_log_returns)
-        beta = cov_matrix[0, 1] / cov_matrix[1, 1]
-    # Jensen CAPM Alpha: can be strongly positive when beta is negative and B&H Return is large
-    s.loc['Alpha [%]'] = s.loc['Return [%]'] - risk_free_rate * 100 - beta * (s.loc['Buy & Hold Return [%]'] - risk_free_rate * 100)  # noqa: E501
-    s.loc['Beta'] = beta
     s.loc['Max. Drawdown [%]'] = max_dd * 100
     s.loc['Avg. Drawdown [%]'] = -dd_peaks.mean() * 100
     s.loc['Max. Drawdown Duration'] = _round_timedelta(dd_dur.max())
@@ -176,7 +154,7 @@ def compute_stats(
     s.loc['Avg. Trade [%]'] = mean_return * 100
     s.loc['Max. Trade Duration'] = _round_timedelta(durations.max())
     s.loc['Avg. Trade Duration'] = _round_timedelta(durations.mean())
-    s.loc['Profit Factor'] = returns[returns > 0].sum() / (abs(returns[returns < 0].sum()) or np.nan)  # noqa: E501
+    s.loc['Profit Factor'] = returns[returns > 0].sum() / (abs(returns[returns < 0].sum()) or np.nan) 
     s.loc['Expectancy [%]'] = returns.mean() * 100
     s.loc['SQN'] = np.sqrt(n_trades) * pl.mean() / (pl.std() or np.nan)
     s.loc['Kelly Criterion'] = win_rate - (1 - win_rate) / (pl[pl > 0].mean() / -pl[pl < 0].mean())
@@ -185,28 +163,4 @@ def compute_stats(
     s.loc['_equity_curve'] = equity_df
     s.loc['_trades'] = trades_df
 
-    s = _Stats(s)
     return s
-
-
-class _Stats(pd.Series):
-    def __repr__(self):
-        with pd.option_context(
-            'display.max_colwidth', 20,  # Prevent expansion due to _equity and _trades dfs
-            'display.max_rows', len(self),  # Reveal self whole
-            'display.precision', 5,  # Enough for my eyes at least
-            # 'format.na_rep', '--',  # TODO: Enable once it works
-        ):
-            return super().__repr__()
-
-
-def dummy_stats():
-    from .strategy import Trade, _Broker
-    index = pd.DatetimeIndex(['2025'])
-    data = pd.DataFrame({col: [np.nan] for col in ('Close',)}, index=index)
-    trade = Trade(_Broker(data=data, cash=10000, spread=.01, commission=.01, margin=.1,
-                          trade_on_close=True, hedging=True, exclusive_orders=False, index=index),
-                  1, 1, 0, None)
-    trade._replace(exit_price=1, exit_bar=0)
-    trade._commissions = np.nan
-    return compute_stats([trade], np.r_[[np.nan]], data, None, 0)
