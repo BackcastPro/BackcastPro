@@ -253,10 +253,6 @@ class Backtest:
                         '`Backtest(..., finalize_trades=True)`を使用してクローズし、'
                         '統計に含めてください。', stacklevel=2)
 
-            # データをフル長に戻す
-            # 将来の`indicator._opts['data'].index`呼び出しが動作するように
-            data._set_length(len(self._data))
-
             equity = pd.Series(broker._equity).bfill().fillna(broker._cash).values
             self._results = compute_stats(
                 trades=broker.closed_trades,
