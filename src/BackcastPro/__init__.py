@@ -1,64 +1,54 @@
 """
+## マニュアル
 
-![xkcd.com/1570](https://imgs.xkcd.com/comics/engineer_syllogism.png){: height=263}
+* [**クイックスタート ユーザーガイド**](../examples/Quick Start User Guide.html)
 
-## Manuals
+## チュートリアル
 
-* [**Quick Start User Guide**](../examples/Quick Start User Guide.html)
+チュートリアルにはフレームワークのほとんどの機能が含まれているため、
+すべてを通して読むことが重要で推奨されます。短時間で完了できます。
 
-## Tutorials
+* [ユーティリティライブラリとコンポーザブルベースストラテジー](../examples/Strategies Library.html)
+* [複数時間軸](../examples/Multiple Time Frames.html)
+* [**パラメータヒートマップと最適化**](../examples/Parameter Heatmap &amp; Optimization.html)
+* [機械学習を使ったトレーディング](../examples/Trading with Machine Learning.html)
 
-The tutorials encompass most framework features, so it's important
-and advisable to go through all of them. They are short.
-
-* [Library of Utilities and Composable Base Strategies](../examples/Strategies Library.html)
-* [Multiple Time Frames](../examples/Multiple Time Frames.html)
-* [**Parameter Heatmap & Optimization**](../examples/Parameter Heatmap &amp; Optimization.html)
-* [Trading with Machine Learning](../examples/Trading with Machine Learning.html)
-
-These tutorials are also available as live Jupyter notebooks:
+これらのチュートリアルはライブJupyterノートブックとしても利用可能です：
 [![Binder](https://mybinder.org/badge_logo.svg)][binder]
 [![Google Colab](https://colab.research.google.com/assets/colab-badge.png)][colab]
-<br>In Colab, you might have to `!pip install backtesting`.
+<br>Colabでは、`!pip install backtesting`が必要な場合があります。
 
 [binder]: \
     https://mybinder.org/v2/gh/kernc/backtesting.py/master?\
 urlpath=lab%2Ftree%2Fdoc%2Fexamples%2FQuick%20Start%20User%20Guide.ipynb
 [colab]: https://colab.research.google.com/github/kernc/backtesting.py/
 
-## Video Tutorials
+## サンプルストラテジー
 
-* Some [**coverage on YouTube**](https://github.com/kernc/backtesting.py/discussions/677).
-* [YouTube search](https://www.youtube.com/results?q=%22backtesting.py%22)
-
-## Example Strategies
-
-* (contributions welcome)
+* （貢献を歓迎します）
 
 
 .. tip::
-    For an overview of recent changes, see
-    [What's New, i.e. the **Change Log**](https://github.com/kernc/backtesting.py/blob/master/CHANGELOG.md).
+    最近の変更の概要については、
+    [新機能、すなわち **変更ログ**](https://github.com/kernc/backtesting.py/blob/master/CHANGELOG.md)をご覧ください。
 
 
-## FAQ
+## よくある質問
 
-Some answers to frequent and popular questions can be found on the
+頻繁に寄せられる人気の質問への回答は、
 [issue tracker](https://github.com/kernc/backtesting.py/issues?q=label%3Aquestion+-label%3Ainvalid)
-or on the [discussion forum](https://github.com/kernc/backtesting.py/discussions) on GitHub.
-Please use the search!
+またはGitHubの[ディスカッションフォーラム](https://github.com/kernc/backtesting.py/discussions)で見つけることができます。
+検索機能をご利用ください！
 
-## License
+## ライセンス
 
-This software is licensed under the terms of [AGPL 3.0]{: rel=license},
-meaning you can use it for any reasonable purpose and remain in
-complete ownership of all the excellent trading strategies you produce,
-but you are also encouraged to make sure any upgrades to _Backtesting.py_
-itself find their way back to the community.
+このソフトウェアは[AGPL 3.0]{: rel=license}の条件でライセンスされており、
+合理的な目的で使用でき、作成した優秀なトレーディングストラテジーの完全な所有権を維持できますが、
+_Backtesting.py_自体へのアップグレードがコミュニティに還元されることを推奨します。
 
 [AGPL 3.0]: https://www.gnu.org/licenses/agpl-3.0.html
 
-# API Reference Documentation
+# APIリファレンスドキュメント
 """
 try:
     from ._version import version as __version__

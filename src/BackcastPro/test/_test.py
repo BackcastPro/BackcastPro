@@ -777,9 +777,9 @@ class TestPlot(TestCase):
 
         bt = Backtest(GOOG, S)
         bt.run()
-        import backtesting._plotting
+        import strategy._plotting
         with _tempfile() as f, \
-                patch(backtesting._plotting, '_MAX_CANDLES', 10), \
+                patch(strategy._plotting, '_MAX_CANDLES', 10), \
                 self.assertWarns(UserWarning):
             bt.plot(filename=f, resample=True)
             # Give browser time to open before tempfile is removed
@@ -964,11 +964,11 @@ class TestLib(TestCase):
         self.assertAlmostEqual(stats['_strategy']._indicators[0][trade['EntryBar']], 234.14)
 
     def test_MultiBacktest(self):
-        import backtesting
-        assert callable(getattr(backtesting, 'Pool', None)), backtesting.__dict__
+        import strategy
+        assert callable(getattr(strategy, 'Pool', None)), strategy.__dict__
         for start_method in mp.get_all_start_methods():
             with self.subTest(start_method=start_method), \
-                    patch(backtesting, 'Pool', mp.get_context(start_method).Pool):
+                    patch(strategy, 'Pool', mp.get_context(start_method).Pool):
                 start_time = time.monotonic()
                 btm = MultiBacktest([GOOG, EURUSD, BTCUSD], SmaCross, cash=100_000)
                 res = btm.run(fast=2)

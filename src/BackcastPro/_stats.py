@@ -8,7 +8,7 @@ import pandas as pd
 from ._util import _data_period, _indicator_warmup_nbars
 
 if TYPE_CHECKING:
-    from .backtesting import Strategy, Trade
+    from .strategy import Strategy, Trade
 
 
 def compute_drawdown_duration_peaks(dd: pd.Series):
@@ -201,7 +201,7 @@ class _Stats(pd.Series):
 
 
 def dummy_stats():
-    from .backtesting import Trade, _Broker
+    from .strategy import Trade, _Broker
     index = pd.DatetimeIndex(['2025'])
     data = pd.DataFrame({col: [np.nan] for col in ('Close',)}, index=index)
     trade = Trade(_Broker(data=data, cash=10000, spread=.01, commission=.01, margin=.1,
