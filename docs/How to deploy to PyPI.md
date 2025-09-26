@@ -1,28 +1,28 @@
-## How to deploy to PyPI
+## PyPIへのデプロイ方法
 
-User Guide:
+ユーザーガイド：
 https://packaging.python.org/en/latest/tutorials/packaging-projects/
 
-### Generating distribution archives
+### 配布アーカイブの生成
 
-generate distribution packages for the package. 
+パッケージの配布パッケージを生成します。
 ```
 python -m build
 ```
 
-### Uploading the distribution archives
+### 配布アーカイブのアップロード
 
-Finally, it’s time to upload your package to the Python Package Index!
+最後に、パッケージをPython Package Indexにアップロードする時です！
 ```
 python -m twine upload --repository pypi dist/*
 ```
 
-You will be prompted for an API [token](https://pypi.org/manage/account/#api-tokens). Use the token value, including the pypi- prefix. Note that the input will be hidden, so be sure to paste correctly.
+API [トークン](https://pypi.org/manage/account/#api-tokens)の入力を求められます。pypi-プレフィックスを含むトークン値を使用してください。入力は隠されるため、正しく貼り付けるように注意してください。
 ```
 Enter your API token: 
 ```
 
-After the command completes, you should see output similar to this:
+コマンドが完了すると、以下のような出力が表示されます：
 
 ```
 Uploading distributions to https://test.pypi.org/legacy/
@@ -33,4 +33,4 @@ Uploading example_package_YOUR_USERNAME_HERE-0.0.1.tar.gz
 100% ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 6.8/6.8 kB • 00:00 • ?
 ```
 
-おめでとう
+おめでとうございます！

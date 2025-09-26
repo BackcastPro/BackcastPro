@@ -1,18 +1,18 @@
 # BackcastPro
 
-A Python backtesting library for trading strategies.
+トレーディング戦略のためのPythonバックテストライブラリ。
 
-## Installation
+## インストール
 
-### From PyPI (for end users)
+### PyPIから（エンドユーザー向け）
 
 ```bash
 pip install BackcastPro
 ```
 
-### Development Installation
+### 開発用インストール
 
-For development, clone the repository and install in development mode:
+開発用に、リポジトリをクローンして開発モードでインストールしてください：
 
 ```bash
 git clone <repository-url>
@@ -20,27 +20,26 @@ cd BackcastPro
 pip install -e .
 ```
 
-**Development Mode Installation (pip install -e .)**
-- The pip install -e . command executed above has installed the project in development mode
-- This automatically adds the src directory to the Python path
+**開発モードインストール（pip install -e .）**
+- 上記で実行したpip install -e .コマンドは、プロジェクトを開発モードでインストールしました
+- これにより、srcディレクトリが自動的にPythonパスに追加されます
 
-## Usage
+## 使用方法
 
 ```python
 from BackcastPro import Strategy, Backtest
 from BackcastPro.lib import resample_apply
 
-# Your trading strategy implementation here
+# ここにトレーディング戦略の実装を記述
 ```
 
-## Documents
+## ドキュメント
 
-- [How to deploy to PyPI](./docs/How%20to%20deploy%20to%20PyPI.md)
-- [Examples](./docs/examples/)
+- [PyPIへのデプロイ方法](./docs/How%20to%20deploy%20to%20PyPI.md)
+- [サンプル](./docs/examples/)
 
-## Bugs
+## バグ報告
 
-Before reporting bugs or posting to the
-[discussion board](https://discord.gg/fzJTbpzE),
+バグを報告したり、[ディスカッションボード](https://discord.gg/fzJTbpzE)に投稿する前に、
 
 

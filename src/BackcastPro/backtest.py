@@ -1,5 +1,5 @@
 """
-Backtest management module.
+バックテスト管理モジュール。
 """
 
 import sys
@@ -27,84 +27,81 @@ from ._util import (
 
 class Backtest:
     """
-    Backtest a particular (parameterized) strategy
-    on particular data.
+    特定のデータに対して特定の（パラメータ化された）戦略をバックテストします。
 
-    Initialize a backtest. Requires data and a strategy to test.
-    After initialization, you can call method
-    `backtesting.backtesting.Backtest.run` to run a backtest
-    instance, or `backtesting.backtesting.Backtest.optimize` to
-    optimize it.
+    バックテストを初期化します。テストするデータと戦略が必要です。
+    初期化後、バックテストインスタンスを実行するために
+    `backtesting.backtesting.Backtest.run`メソッドを呼び出すか、
+    最適化するために`backtesting.backtesting.Backtest.optimize`を呼び出すことができます。
 
-    `data` is a `pd.DataFrame` with columns:
-    `Open`, `High`, `Low`, `Close`, and (optionally) `Volume`.
-    If any columns are missing, set them to what you have available,
-    e.g.
+    `data`は以下の列を持つ`pd.DataFrame`です：
+    `Open`, `High`, `Low`, `Close`, および（オプションで）`Volume`。
+    列が不足している場合は、利用可能なものに設定してください。
+    例：
 
         df['Open'] = df['High'] = df['Low'] = df['Close']
 
-    The passed data frame can contain additional columns that
-    can be used by the strategy (e.g. sentiment info).
-    DataFrame index can be either a datetime index (timestamps)
-    or a monotonic range index (i.e. a sequence of periods).
+    渡されたデータフレームには、戦略で使用できる追加の列
+    （例：センチメント情報）を含めることができます。
+    DataFrameのインデックスは、datetimeインデックス（タイムスタンプ）または
+    単調増加の範囲インデックス（期間のシーケンス）のいずれかです。
 
-    `strategy` is a `backtesting.backtesting.Strategy`
-    _subclass_ (not an instance).
+    `strategy`は`backtesting.backtesting.Strategy`の
+    _サブクラス_（インスタンスではありません）です。
 
-    `cash` is the initial cash to start with.
+    `cash`は開始時の初期現金です。
 
-    `spread` is the the constant bid-ask spread rate (relative to the price).
-    E.g. set it to `0.0002` for commission-less forex
-    trading where the average spread is roughly 0.2‰ of the asking price.
+    `spread`は一定のビッドアスクスプレッド率（価格に対する相対値）です。
+    例：平均スプレッドがアスク価格の約0.2‰である手数料なしの
+    外国為替取引では`0.0002`に設定してください。
 
-    `commission` is the commission rate. E.g. if your broker's commission
-    is 1% of order value, set commission to `0.01`.
-    The commission is applied twice: at trade entry and at trade exit.
-    Besides one single floating value, `commission` can also be a tuple of floating
-    values `(fixed, relative)`. E.g. set it to `(100, .01)`
-    if your broker charges minimum $100 + 1%.
-    Additionally, `commission` can be a callable
+    `commission`は手数料率です。例：ブローカーの手数料が
+    注文価値の1%の場合、commissionを`0.01`に設定してください。
+    手数料は2回適用されます：取引開始時と取引終了時です。
+    単一の浮動小数点値に加えて、`commission`は浮動小数点値の
+    タプル`(fixed, relative)`にすることもできます。例：ブローカーが
+    最低$100 + 1%を請求する場合は`(100, .01)`に設定してください。
+    さらに、`commission`は呼び出し可能な
     `func(order_size: int, price: float) -> float`
-    (note, order size is negative for short orders),
-    which can be used to model more complex commission structures.
-    Negative commission values are interpreted as market-maker's rebates.
+    （注：ショート注文では注文サイズは負の値）にすることもでき、
+    より複雑な手数料構造をモデル化するために使用できます。
+    負の手数料値はマーケットメーカーのリベートとして解釈されます。
 
     .. note::
-        Before v0.4.0, the commission was only applied once, like `spread` is now.
-        If you want to keep the old behavior, simply set `spread` instead.
+        v0.4.0より前では、手数料は`spread`と同様に1回のみ適用されていました。
+        古い動作を維持したい場合は、代わりに`spread`を設定してください。
 
     .. note::
-        With nonzero `commission`, long and short orders will be placed
-        at an adjusted price that is slightly higher or lower (respectively)
-        than the current price. See e.g.
+        非ゼロの`commission`では、ロングとショートの注文は
+        現在価格よりわずかに高いまたは低い（それぞれ）調整価格で
+        配置されます。例：
         [#153](https://github.com/kernc/backtesting.py/issues/153),
         [#538](https://github.com/kernc/backtesting.py/issues/538),
-        [#633](https://github.com/kernc/backtesting.py/issues/633).
+        [#633](https://github.com/kernc/backtesting.py/issues/633)。
 
-    `margin` is the required margin (ratio) of a leveraged account.
-    No difference is made between initial and maintenance margins.
-    To run the backtest using e.g. 50:1 leverge that your broker allows,
-    set margin to `0.02` (1 / leverage).
+    `margin`はレバレッジアカウントの必要証拠金（比率）です。
+    初期証拠金と維持証拠金の区別はありません。
+    ブローカーが許可する50:1レバレッジなどでバックテストを実行するには、
+    marginを`0.02`（1 / レバレッジ）に設定してください。
 
-    If `trade_on_close` is `True`, market orders will be filled
-    with respect to the current bar's closing price instead of the
-    next bar's open.
+    `trade_on_close`が`True`の場合、成行注文は
+    次のバーの始値ではなく、現在のバーの終値で約定されます。
 
-    If `hedging` is `True`, allow trades in both directions simultaneously.
-    If `False`, the opposite-facing orders first close existing trades in
-    a [FIFO] manner.
+    `hedging`が`True`の場合、両方向の取引を同時に許可します。
+    `False`の場合、反対方向の注文は既存の取引を
+    [FIFO]方式で最初にクローズします。
 
-    If `exclusive_orders` is `True`, each new order auto-closes the previous
-    trade/position, making at most a single trade (long or short) in effect
-    at each time.
+    `exclusive_orders`が`True`の場合、各新しい注文は前の
+    取引/ポジションを自動クローズし、各時点で最大1つの取引
+    （ロングまたはショート）のみが有効になります。
 
-    If `finalize_trades` is `True`, the trades that are still
-    [active and ongoing] at the end of the backtest will be closed on
-    the last bar and will contribute to the computed backtest statistics.
+    `finalize_trades`が`True`の場合、バックテスト終了時に
+    まだ[アクティブで継続中]の取引は最後のバーでクローズされ、
+    計算されたバックテスト統計に貢献します。
 
-    .. tip:: Fractional trading
-        See also `backtesting.lib.FractionalBacktest` if you want to trade
-        fractional units (of e.g. bitcoin).
+    .. tip:: 分数取引
+        分数単位（例：ビットコイン）で取引したい場合は、
+        `backtesting.lib.FractionalBacktest`も参照してください。
 
     [FIFO]: https://www.investopedia.com/terms/n/nfa-compliance-rule-2-43b.asp
     [active and ongoing]: https://kernc.github.io/backtesting.py/doc/backtesting/backtesting.html#backtesting.backtesting.Strategy.trades
@@ -122,7 +119,7 @@ class Backtest:
                  exclusive_orders=False,
                  finalize_trades=False,
                  ):
-        # Import here to avoid circular imports
+        # 循環インポートを避けるためにここでインポート
         from .strategy import Strategy
         
         if not (isinstance(strategy, type) and issubclass(strategy, Strategy)):
@@ -140,10 +137,10 @@ class Backtest:
 
         data = data.copy(deep=False)
 
-        # Convert index to datetime index
+        # インデックスをdatetimeインデックスに変換
         if (not isinstance(data.index, pd.DatetimeIndex) and
             not isinstance(data.index, pd.RangeIndex) and
-            # Numeric index with most large numbers
+            # 大部分が大きな数値の数値インデックス
             (data.index.is_numeric() and
              (data.index > pd.Timestamp('1975').timestamp()).mean() > .8)):
             try:
@@ -238,7 +235,7 @@ class Backtest:
             period of the `Strategy.I` indicator which lags the most.
             Obviously, this can affect results.
         """
-        # Import here to avoid circular imports
+        # 循環インポートを避けるためにここでインポート
         from .strategy import Strategy
         
         data = _Data(self._data.copy(deep=False))
@@ -246,43 +243,43 @@ class Backtest:
         strategy: Strategy = self._strategy(broker, data, kwargs)
 
         strategy.init()
-        data._update()  # Strategy.init might have changed/added to data.df
+        data._update()  # Strategy.initがdata.dfを変更/追加した可能性がある
 
-        # Indicators used in Strategy.next()
+        # Strategy.next()で使用されるインジケーター
         indicator_attrs = _strategy_indicators(strategy)
 
-        # Skip first few candles where indicators are still "warming up"
-        # +1 to have at least two entries available
+        # インジケーターがまだ「ウォームアップ」中の最初の数本のキャンドルをスキップ
+        # 少なくとも2つのエントリが利用可能になるように+1
         start = 1 + _indicator_warmup_nbars(strategy)
 
-        # Disable "invalid value encountered in ..." warnings. Comparison
-        # np.nan >= 3 is not invalid; it's False.
+        # "invalid value encountered in ..."警告を無効化。比較
+        # np.nan >= 3は無効ではない；Falseです。
         with np.errstate(invalid='ignore'):
 
             for i in _tqdm(range(start, len(self._data)), desc=self.run.__qualname__,
                            unit='bar', mininterval=2, miniters=100):
-                # Prepare data and indicators for `next` call
+                # `next`呼び出しのためのデータとインジケーターを準備
                 data._set_length(i + 1)
                 for attr, indicator in indicator_attrs:
-                    # Slice indicator on the last dimension (case of 2d indicator)
+                    # 最後の次元でインジケーターをスライス（2次元インジケーターの場合）
                     setattr(strategy, attr, indicator[..., :i + 1])
 
-                # Handle orders processing and broker stuff
+                # 注文処理とブローカー関連の処理
                 try:
                     broker.next()
                 except _OutOfMoneyError:
                     break
 
-                # Next tick, a moment before bar close
+                # 次のティック、バークローズ直前
                 strategy.next()
             else:
                 if self._finalize_trades is True:
-                    # Close any remaining open trades so they produce some stats
+                    # 統計を生成するために残っているオープン取引をクローズ
                     for trade in reversed(broker.trades):
                         trade.close()
 
-                    # HACK: Re-run broker one last time to handle close orders placed in the last
-                    #  strategy iteration. Use the same OHLC values as in the last broker iteration.
+                    # HACK: 最後の戦略イテレーションで配置されたクローズ注文を処理するために
+                    #  ブローカーを最後にもう一度実行。最後のブローカーイテレーションと同じOHLC値を使用。
                     if start < len(self._data):
                         try_(broker.next, exception=_OutOfMoneyError)
                 elif len(broker.trades):

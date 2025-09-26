@@ -1,5 +1,5 @@
 """
-Orders management module.
+注文管理モジュール。
 """
 
 from typing import TYPE_CHECKING
@@ -10,16 +10,16 @@ if TYPE_CHECKING:
 
 class _Orders(tuple):
     """
-    TODO: remove this class. Only for deprecation.
+    TODO: このクラスを削除する。非推奨のためのみ。
     """
     def cancel(self):
-        """Cancel all non-contingent (i.e. SL/TP) orders."""
+        """すべての非条件付き（つまりSL/TP）注文をキャンセルします。"""
         for order in self:
             if not order.is_contingent:
                 order.cancel()
 
     def __getattr__(self, item):
-        # TODO: Warn on deprecations from the previous version. Remove in the next.
+        # TODO: 前バージョンからの非推奨について警告する。次バージョンで削除。
         removed_attrs = ('entry', 'set_entry', 'is_long', 'is_short',
                          'sl', 'tp', 'set_sl', 'set_tp')
         if item in removed_attrs:

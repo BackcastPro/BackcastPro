@@ -1,5 +1,5 @@
 """
-Order management module.
+注文管理モジュール。
 """
 
 from typing import TYPE_CHECKING, Optional
@@ -11,15 +11,15 @@ if TYPE_CHECKING:
 
 class Order:
     """
-    Place new orders through `Strategy.buy()` and `Strategy.sell()`.
-    Query existing orders through `Strategy.orders`.
+    `Strategy.buy()`と`Strategy.sell()`を通じて新しい注文を出します。
+    `Strategy.orders`を通じて既存の注文を照会します。
 
-    When an order is executed or [filled], it results in a `Trade`.
+    注文が実行または[約定]されると、`Trade`が発生します。
 
-    If you wish to modify aspects of a placed but not yet filled order,
-    cancel it and place a new one instead.
+    出されたがまだ約定されていない注文の側面を変更したい場合は、
+    キャンセルして新しい注文を出してください。
 
-    All placed orders are [Good 'Til Canceled].
+    すべての出された注文は[取消注文まで有効]です。
 
     [filled]: https://www.investopedia.com/terms/f/fill.asp
     [Good 'Til Canceled]: https://www.investopedia.com/terms/g/gtc.asp

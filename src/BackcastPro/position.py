@@ -1,5 +1,5 @@
 """
-Position management module.
+ポジション管理モジュール。
 """
 
 from typing import TYPE_CHECKING
@@ -10,13 +10,13 @@ if TYPE_CHECKING:
 
 class Position:
     """
-    Currently held asset position, available as
-    `backtesting.backtesting.Strategy.position` within
-    `backtesting.backtesting.Strategy.next`.
-    Can be used in boolean contexts, e.g.
+    現在保有している資産ポジション。
+    `backtesting.backtesting.Strategy.next`内で
+    `backtesting.backtesting.Strategy.position`として利用可能です。
+    ブール値コンテキストで使用できます。例：
 
         if self.position:
-            ...  # we have a position, either long or short
+            ...  # ポジションがあります（ロングまたはショート）
     """
     def __init__(self, broker: '_Broker'):
         self.__broker = broker
@@ -26,28 +26,28 @@ class Position:
 
     @property
     def size(self) -> float:
-        """Position size in units of asset. Negative if position is short."""
+        """資産単位でのポジションサイズ。ショートポジションの場合は負の値。"""
         return sum(trade.size for trade in self.__broker.trades)
 
     @property
     def pl(self) -> float:
-        """Profit (positive) or loss (negative) of the current position in cash units."""
+        """現在のポジションの利益（正）または損失（負）を現金単位で。"""
         return sum(trade.pl for trade in self.__broker.trades)
 
     @property
     def pl_pct(self) -> float:
-        """Profit (positive) or loss (negative) of the current position in percent."""
+        """現在のポジションの利益（正）または損失（負）をパーセントで。"""
         total_invested = sum(trade.entry_price * abs(trade.size) for trade in self.__broker.trades)
         return (self.pl / total_invested) * 100 if total_invested else 0
 
     @property
     def is_long(self) -> bool:
-        """True if the position is long (position size is positive)."""
+        """ポジションがロング（ポジションサイズが正）の場合True。"""
         return self.size > 0
 
     @property
     def is_short(self) -> bool:
-        """True if the position is short (position size is negative)."""
+        """ポジションがショート（ポジションサイズが負）の場合True。"""
         return self.size < 0
 
     def close(self, portion: float = 1.):

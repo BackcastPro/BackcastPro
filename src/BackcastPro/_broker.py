@@ -1,5 +1,5 @@
 """
-Broker management module.
+ブローカー管理モジュール。
 """
 
 import warnings
@@ -94,8 +94,8 @@ class _Broker:
         order = Order(self, size, limit, stop, sl, tp, trade, tag)
 
         if not trade:
-            # If exclusive orders (each new order auto-closes previous orders/position),
-            # cancel all non-contingent orders and close all open trades beforehand
+            # 排他的注文（各新しい注文が前の注文/ポジションを自動クローズ）の場合、
+            # 事前にすべての非条件付き注文をキャンセルし、すべてのオープン取引をクローズ
             if self._exclusive_orders:
                 for o in self.orders:
                     if not o.is_contingent:
@@ -103,7 +103,7 @@ class _Broker:
                 for t in self.trades:
                     t.close()
 
-        # Put the new order in the order queue, Ensure SL orders are processed first
+        # 新しい注文を注文キューに配置、SL注文が最初に処理されるようにする
         self.orders.insert(0 if trade and stop else len(self.orders), order)
 
         return order
@@ -126,7 +126,7 @@ class _Broker:
 
     @property
     def margin_available(self) -> float:
-        # From https://github.com/QuantConnect/Lean/pull/3768
+        # https://github.com/QuantConnect/Lean/pull/3768 から
         margin_used = sum(trade.value / self._leverage for trade in self.trades)
         return max(0, self.equity - margin_used)
 
@@ -134,11 +134,11 @@ class _Broker:
         i = self._i = len(self._data) - 1
         self._process_orders()
 
-        # Log account equity for the equity curve
+        # エクイティカーブ用にアカウントエクイティを記録
         equity = self.equity
         self._equity[i] = equity
 
-        # If equity is negative, set all to 0 and stop the simulation
+        # エクイティが負の場合、すべてを0に設定してシミュレーションを停止
         if equity <= 0:
             assert self.margin_available <= 0
             for trade in self.trades:
@@ -152,10 +152,10 @@ class _Broker:
         open, high, low = data.Open[-1], data.High[-1], data.Low[-1]
         reprocess_orders = False
 
-        # Process orders
+        # 注文を処理
         for order in list(self.orders):  # type: Order
 
-            # Related SL/TP order was already removed
+            # 関連するSL/TP注文は既に削除されている
             if order not in self.orders:
                 continue
 

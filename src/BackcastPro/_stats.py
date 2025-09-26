@@ -17,7 +17,7 @@ def compute_drawdown_duration_peaks(dd: pd.Series):
     df = iloc.to_frame('iloc').assign(prev=iloc.shift())
     df = df[df['iloc'] > df['prev'] + 1].astype(np.int64)
 
-    # If no drawdown since no trade, avoid below for pandas sake and return nan series
+    # 取引がないためドローダウンがない場合、pandasのために以下を回避し、nanシリーズを返す
     if not len(df):
         return (dd.replace(0, np.nan),) * 2
 

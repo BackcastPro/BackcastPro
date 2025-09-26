@@ -1,5 +1,5 @@
 """
-Trade management module.
+取引管理モジュール。
 """
 
 import numpy as np
@@ -15,8 +15,8 @@ if TYPE_CHECKING:
 
 class Trade:
     """
-    When an `Order` is filled, it results in an active `Trade`.
-    Find active trades in `Strategy.trades` and closed, settled trades in `Strategy.closed_trades`.
+    `Order`が約定されると、アクティブな`Trade`が発生します。
+    アクティブな取引は`Strategy.trades`で、クローズされた決済済み取引は`Strategy.closed_trades`で見つけることができます。
     """
     def __init__(self, broker: '_Broker', size: int, entry_price: float, entry_bar, tag):
         self.__broker = broker
@@ -44,7 +44,7 @@ class Trade:
         return copy(self)._replace(**kwargs)
 
     def close(self, portion: float = 1.):
-        """Place new `Order` to close `portion` of the trade at next market price."""
+        """次の市場価格で取引の`portion`をクローズする新しい`Order`を出します。"""
         assert 0 < portion <= 1, "portion must be a fraction between 0 and 1"
         # Ensure size is an int to avoid rounding errors on 32-bit OS
         size = copysign(max(1, int(round(abs(self.__size) * portion))), -self.__size)

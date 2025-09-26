@@ -1,5 +1,5 @@
 """
-Custom exceptions module.
+カスタム例外モジュール。
 """
 
 

@@ -1,12 +1,12 @@
 """
-Collection of common building blocks, helper auxiliary functions and
-composable strategy classes for reuse.
+再利用のための共通の構成要素、ヘルパー補助関数、
+およびコンポーザブル戦略クラスのコレクション。
 
-Intended for simple missing-link procedures, not reinventing
-of better-suited, state-of-the-art, fast libraries,
-such as TA-Lib, Tulipy, PyAlgoTrade, NumPy, SciPy ...
+TA-Lib、Tulipy、PyAlgoTrade、NumPy、SciPyなどの
+より適切で最先端の高速ライブラリの再発明ではなく、
+シンプルな欠落リンク手順を目的としています。
 
-Please raise ideas for additions to this collection on the [issue tracker].
+このコレクションへの追加アイデアは[issue tracker]で提案してください。
 
 [issue tracker]: https://github.com/kernc/backtesting.py
 """
@@ -26,7 +26,7 @@ import pandas as pd
 from ._plotting import plot_heatmaps as _plot_heatmaps
 from ._stats import compute_stats as _compute_stats
 from ._util import SharedMemoryManager, _Array, _as_str, _batch, _tqdm, patch
-from .backtesting import Backtest, Strategy
+from .strategy import Backtest, Strategy
 
 __pdoc__ = {}
 
@@ -38,8 +38,8 @@ OHLCV_AGG = OrderedDict((
     ('Close', 'last'),
     ('Volume', 'sum'),
 ))
-"""Dictionary of rules for aggregating resampled OHLCV data frames,
-e.g.
+"""リサンプルされたOHLCVデータフレームを集約するためのルール辞書。
+例：
 
     df.resample('4H', label='right').agg(OHLCV_AGG).dropna()
 """
