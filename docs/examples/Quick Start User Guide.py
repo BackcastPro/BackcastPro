@@ -13,11 +13,9 @@ class SmaCross(Strategy):
 
 
 # データ取得
-from BackcastPro.data.datareader import DataReader
-
-df: pd.DataFrame = DataReader('72030')
+from BackcastPro.data import TOYOTA
 
 from BackcastPro import Backtest
-bt = Backtest(df, SmaCross, cash=10_000, commission=.002)
+bt = Backtest(TOYOTA, SmaCross, cash=10_000, commission=.002)
 stats = bt.run()
 stats
