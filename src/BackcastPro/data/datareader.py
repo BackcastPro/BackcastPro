@@ -3,7 +3,7 @@
 import os
 import requests
 import pandas as pd
-from datetime import datetime
+from datetime import datetime, timedelta
 from typing import Union
 from dotenv import load_dotenv
 
@@ -12,15 +12,17 @@ load_dotenv()
 
 
 def DataReader(code: str, 
-        start_date: Union[str, datetime], 
-        end_date: Union[str, datetime]) -> pd.DataFrame:
+        start_date: Union[str, datetime, None] = None, 
+        end_date: Union[str, datetime, None] = None) -> pd.DataFrame:
     """
     Fetch stock price data from API.
     
     Args:
-        code (str): Stock code (e.g., '72030' for Toyota)
-        start_date (Union[str, datetime]): Start date for data retrieval
-        end_date (Union[str, datetime]): End date for data retrieval
+        code (str): Stock code (e.g., '7203' for Toyota)
+        start_date (Union[str, datetime, None], optional): Start date for data retrieval. 
+                                                          If None, defaults to 1 year ago.
+        end_date (Union[str, datetime, None], optional): End date for data retrieval. 
+                                                        If None, defaults to today.
         
     Returns:
         pd.DataFrame: Stock price data with columns like 'Open', 'High', 'Low', 'Close', 'Volume'
@@ -29,6 +31,12 @@ def DataReader(code: str,
         requests.RequestException: If API request fails
         ValueError: If dates are invalid or API returns error
     """
+    # Set default dates if not provided
+    if end_date is None:
+        end_date = datetime.now()
+    if start_date is None:
+        start_date = end_date - timedelta(days=365)
+    
     # Convert datetime objects to string format if needed
     if isinstance(start_date, datetime):
         start_date_str = start_date.strftime('%Y-%m-%d')

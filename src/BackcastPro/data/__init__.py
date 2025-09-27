@@ -3,5 +3,5 @@
 from .datareader import DataReader
 
 
-# TOYOTA = DataReader('72030')
+TOYOTA = DataReader('72030')
 
