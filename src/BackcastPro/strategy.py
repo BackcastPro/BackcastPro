@@ -72,6 +72,7 @@ class Strategy(metaclass=ABCMeta):
 
             super().next()
         """
+        
 
     class __FULL_EQUITY(float):  # noqa: N801
         """

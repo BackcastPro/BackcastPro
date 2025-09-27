@@ -230,12 +230,15 @@ class Backtest:
 
             for i in range(start, len(self._data)):
                 # 注文処理とブローカー関連の処理
+                data = self._data.iloc[:i]
                 try:
+                    broker._data = data
                     broker.next()
                 except:
                     break
 
                 # 次のティック、バークローズ直前
+                strategy._data = data
                 strategy.next()
             else:
                 if self._finalize_trades is True:
