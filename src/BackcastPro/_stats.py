@@ -1,11 +1,10 @@
 from __future__ import annotations
 
+from numbers import Number
 from typing import TYPE_CHECKING, List, Union, cast
 
 import numpy as np
 import pandas as pd
-
-from ._util import _data_period
 
 if TYPE_CHECKING:
    from .strategy import Strategy
@@ -33,6 +32,10 @@ def geometric_mean(returns: pd.Series) -> float:
         return 0
     return np.exp(np.log(returns).sum() / (len(returns) or np.nan)) - 1
 
+def _data_period(index) -> Union[pd.Timedelta, Number]:
+    """Return data index period as pd.Timedelta"""
+    values = pd.Series(index[-100:])
+    return values.diff().dropna().median()
 
 def compute_stats(
         trades: Union[List['Trade'], pd.DataFrame],
