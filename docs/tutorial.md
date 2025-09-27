@@ -1,4 +1,4 @@
-# チュートリアル
+# <img src="img/logo.drawio.svg" alt="BackcastPro Logo" width="40" height="24"> チュートリアル
 
 BackcastProを使ったバックテストの基本的な使い方を学びます。
 

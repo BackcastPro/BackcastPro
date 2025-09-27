@@ -1,4 +1,4 @@
-# BackcastPro ドキュメント
+# <img src="img/logo.drawio.svg" alt="BackcastPro Logo" width="40" height="24"> BackcastPro ドキュメント
 
 BackcastProは、トレーディング戦略のためのPythonバックテストライブラリです。
 

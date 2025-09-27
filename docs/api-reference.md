@@ -1,4 +1,4 @@
-# APIリファレンス
+# <img src="img/logo.drawio.svg" alt="BackcastPro Logo" width="40" height="24"> APIリファレンス
 
 BackcastProの主要クラスとメソッドの詳細なリファレンスです。
 

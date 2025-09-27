@@ -1,4 +1,4 @@
-# トラブルシューティングガイド
+# <img src="img/logo.drawio.svg" alt="BackcastPro Logo" width="40" height="24"> トラブルシューティングガイド
 
 BackcastProを使用する際によく発生する問題とその解決方法をまとめています。
 

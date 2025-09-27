@@ -1,4 +1,4 @@
-# 開発者向けガイド
+# <img src="img/logo.drawio.svg" alt="BackcastPro Logo" width="40" height="24"> 開発者向けガイド
 
 BackcastProの開発に参加するためのガイドです。
 

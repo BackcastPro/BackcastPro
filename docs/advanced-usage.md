@@ -1,4 +1,4 @@
-# 高度な使い方ガイド
+# <img src="img/logo.drawio.svg" alt="BackcastPro Logo" width="40" height="24"> 高度な使い方ガイド
 
 BackcastProの高度な機能とテクニックを学びます。
 
