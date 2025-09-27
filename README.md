@@ -1,4 +1,4 @@
-# <img src="docs/img/logo.drawio.svg" alt="BackcastPro Logo" width="40" height="24"> BackcastPro
+# <img src="https://raw.githubusercontent.com/botterYosuke/BackcastPro/main/docs/img/logo.drawio.svg" alt="BackcastPro Logo" width="40" height="24"> BackcastPro
 
 トレーディング戦略のためのPythonバックテストライブラリ。
 
@@ -38,14 +38,7 @@ from BackcastPro.data import DataReader, JapanStocks
 
 ## ドキュメント
 
-- [ドキュメント一覧](./docs/index.md)
-- [チュートリアル](./docs/tutorial.md)
-- [APIリファレンス](./docs/api-reference.md)
-- [高度な使い方](./docs/advanced-usage.md)
-- [トラブルシューティング](./docs/troubleshooting.md)
-- [開発者ガイド](./docs/developer-guide.md)
-- [PyPIへのデプロイ方法](./docs/how-to-deploy-to-PyPI.md)
-- [サンプル](./docs/examples/)
+- [ドキュメント一覧](https://github.com/botterYosuke/BackcastPro/blob/main/docs/index.md)
 
 ## バグ報告 / サポート
 

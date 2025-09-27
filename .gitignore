@@ -9,4 +9,4 @@ __pycache__/*
 dist
 
 *.html
-.playwright-mcp/
+.playwright-mcp

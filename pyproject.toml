@@ -1,6 +1,6 @@
 [project]
 name = "BackcastPro"
-version = "0.0.4"
+version = "0.0.5"
 authors = [
   { name="botterYosuke", email="yosuke.sasazawa@gmail.com" },
 ]
@@ -14,7 +14,7 @@ classifiers = [
 ]
 
 [project.urls]
-Homepage = "https://BackcastPro.github.io/BackcastPro/"
+Homepage = "https://github.com/botterYosuke/BackcastPro/"
 Issues = "https://github.com/BackcastPro/BackcastPro/issues"
 Logo = "https://raw.githubusercontent.com/BackcastPro/BackcastPro/main/docs/img/logo.drawio.svg"
 
