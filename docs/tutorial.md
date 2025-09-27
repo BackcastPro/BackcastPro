@@ -12,23 +12,31 @@ BackcastProを使ったバックテストの基本的な使い方を学びます
 6. [結果の解釈](#結果の解釈)
 7. [次のステップ](#次のステップ)
 
-## インストール
+## インストール（Windows）
 
-### PyPIからインストール
-
-```bash
-pip install BackcastPro
-```
-
-### 開発用インストール
-
-```bash
-git clone <repository-url>
-cd BackcastPro
-pip install -e .
+```powershell
+py -m pip install BackcastPro
 ```
 
 ## 基本的な使い方
+
+```mermaid
+sequenceDiagram
+    participant U as User
+    participant D as DataReader
+    participant B as Backtest
+    participant S as Strategy
+    participant R as Results
+    U->>D: DataReader("7203")
+    D-->>U: OHLCV DataFrame
+    U->>B: Backtest(data, Strategy)
+    B->>S: init()
+    loop 各バー
+        B->>S: next()
+        S->>B: buy()/sell()
+    end
+    B-->>R: pd.Series（統計含む）
+```
 
 ### 1. 必要なライブラリのインポート
 
@@ -126,61 +134,18 @@ results = bt.run()
 
 ## バックテストの実行
 
-### 基本的なバックテスト
-
 ```python
-# シンプルなバックテスト
-bt = Backtest(data, BuyAndHold, cash=10000)
-results = bt.run()
-```
-
-### パラメータの設定
-
-```python
-# 詳細なパラメータ設定
 bt = Backtest(
-    data=data,
-    strategy=BuyAndHold,
-    cash=100000,           # 初期資金10万円
-    commission=0.001,      # 手数料0.1%
-    spread=0.0002,         # スプレッド0.02%
-    trade_on_close=True,   # 終値で約定
-    finalize_trades=True   # 終了時に未決済をクローズ
+    data,
+    BuyAndHold,
+    cash=10000,
+    commission=0.001,
+    finalize_trades=True,
 )
-
 results = bt.run()
 ```
 
-### 複数の戦略を比較
-
-```python
-# 複数の戦略を定義
-class BuyAndHold(Strategy):
-    def init(self):
-        pass
-    def next(self):
-        if len(self.data) == 1:
-            self.buy()
-
-class SellAndHold(Strategy):
-    def init(self):
-        pass
-    def next(self):
-        if len(self.data) == 1:
-            self.sell()
-
-# 各戦略でバックテストを実行
-strategies = [BuyAndHold, SellAndHold]
-results = {}
-
-for strategy in strategies:
-    bt = Backtest(data, strategy, cash=10000)
-    results[strategy.__name__] = bt.run()
-
-# 結果を比較
-for name, result in results.items():
-    print(f"{name}: リターン {result['Return [%]']:.2f}%")
-```
+> 複数戦略の比較や最適化の例は `examples/` と「高度な使い方」を参照してください。
 
 ## 結果の解釈
 
@@ -251,18 +216,7 @@ class MovingAverageCross(Strategy):
 
 ### 2. リスク管理の追加
 
-```python
-class RiskManagedStrategy(Strategy):
-    def init(self):
-        self.data['SMA'] = self.data.Close.rolling(20).mean()
-        self.data['ATR'] = calculate_atr(self.data)  # ATRを計算
-    
-    def next(self):
-        if self.data.SMA.iloc[-1] > self.data.Close.iloc[-1]:
-            # リスク管理付きで買い
-            stop_loss = self.data.Close.iloc[-1] - 2 * self.data.ATR.iloc[-1]
-            self.buy(sl=stop_loss)
-```
+`buy()` / `sell()` の `sl` と `tp` を活用できます（詳細は API リファレンス参照）。
 
 ### 3. パフォーマンスの可視化
 
@@ -329,12 +283,5 @@ A: 以下の点を確認してください：
 
 ## まとめ
 
-このチュートリアルでは、BackcastProの基本的な使い方を学びました：
-
-1. **インストール**: PyPIまたは開発用インストール
-2. **データ取得**: DataReaderを使用した株価データの取得
-3. **戦略実装**: Strategyクラスを継承した戦略の作成
-4. **バックテスト実行**: Backtestクラスによるバックテストの実行
-5. **結果分析**: 統計情報とトレード履歴の確認
-
-次のステップとして、より複雑な戦略の実装やリスク管理の追加に挑戦してみてください。
+- インストール → データ取得 → 戦略実装 → 実行 → 分析、の順に進めます
+- 詳細は「APIリファレンス」「高度な使い方」「サンプルコード」を参照してください

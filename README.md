@@ -2,27 +2,30 @@
 
 トレーディング戦略のためのPythonバックテストライブラリ。
 
-## インストール
+## インストール（Windows）
 
 ### PyPIから（エンドユーザー向け）
 
-```bash
-pip install BackcastPro
+```powershell
+py -m pip install BackcastPro
 ```
 
 ### 開発用インストール
 
-開発用に、リポジトリをクローンして開発モードでインストールしてください：
+開発用に、リポジトリをクローンして開発モードでインストールします。
 
-```bash
+```powershell
 git clone <repository-url>
 cd BackcastPro
-pip install -e .
+py -m venv .venv
+.\.venv\Scripts\Activate.ps1
+py -m pip install -e .
+py -m pip install -r requirements.txt
 ```
 
-**開発モードインストール（pip install -e .）**
-- 上記で実行したpip install -e .コマンドは、プロジェクトを開発モードでインストールしました
-- これにより、srcディレクトリが自動的にPythonパスに追加されます
+**開発モードインストール（py -m pip install -e .）**
+- プロジェクトを開発モードでインストールします
+- `src` ディレクトリが自動的に Python パスに追加されます
 
 ## 使用方法
 
@@ -36,16 +39,17 @@ from BackcastPro.data import DataReader, JapanStocks
 ## ドキュメント
 
 - [ドキュメント一覧](./docs/index.md)
-- [チュートリアル](./docs/tutorial.md) - 基本的な使い方
-- [APIリファレンス](./docs/api-reference.md) - クラスとメソッドの詳細
-- [高度な使い方](./docs/advanced-usage.md) - 高度な機能とテクニック
-- [トラブルシューティング](./docs/troubleshooting.md) - よくある問題と解決方法
-- [開発者ガイド](./docs/developer-guide.md) - 開発に参加するための情報
+- [チュートリアル](./docs/tutorial.md)
+- [APIリファレンス](./docs/api-reference.md)
+- [高度な使い方](./docs/advanced-usage.md)
+- [トラブルシューティング](./docs/troubleshooting.md)
+- [開発者ガイド](./docs/developer-guide.md)
 - [PyPIへのデプロイ方法](./docs/how-to-deploy-to-PyPI.md)
 - [サンプル](./docs/examples/)
 
-## バグ報告
+## バグ報告 / サポート
 
-バグを報告したり、[ディスカッションボード](https://discord.gg/fzJTbpzE)に投稿する前に、
-
+- バグ報告や要望は GitHub Issues へ
+- 質問は Discord コミュニティへ（[招待リンク](https://discord.gg/fzJTbpzE)）
+- 使い方はドキュメントをご参照ください
 

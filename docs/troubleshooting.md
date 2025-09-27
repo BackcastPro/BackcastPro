@@ -18,14 +18,16 @@ BackcastProを使用する際によく発生する問題とその解決方法を
 **原因:** BackcastProが正しくインストールされていない
 
 **解決方法:**
-```bash
+```powershell
 # PyPIから再インストール
-pip install BackcastPro
+py -m pip install BackcastPro
 
 # または開発用インストール
 git clone <repository-url>
 cd BackcastPro
-pip install -e .
+py -m venv .venv
+.\.venv\Scripts\Activate.ps1
+py -m pip install -e .
 ```
 
 ### 問題: `ImportError: cannot import name 'Strategy'`
@@ -33,12 +35,12 @@ pip install -e .
 **原因:** 古いバージョンがインストールされている、またはインストールが不完全
 
 **解決方法:**
-```bash
+```powershell
 # 既存のインストールをアンインストール
-pip uninstall BackcastPro
+py -m pip uninstall BackcastPro -y
 
 # 最新版を再インストール
-pip install BackcastPro
+py -m pip install BackcastPro
 ```
 
 ### 問題: 依存関係の競合
@@ -46,15 +48,13 @@ pip install BackcastPro
 **原因:** 他のライブラリとの依存関係の競合
 
 **解決方法:**
-```bash
-# 仮想環境を作成
-python -m venv backcastpro_env
-source backcastpro_env/bin/activate  # Linux/Mac
-# または
-backcastpro_env\Scripts\activate  # Windows
+```powershell
+# 仮想環境を作成（Windows）
+py -m venv backcastpro_env
+.\backcastpro_env\Scripts\Activate.ps1
 
 # クリーンな環境でインストール
-pip install BackcastPro
+py -m pip install BackcastPro
 ```
 
 ## データ関連の問題
@@ -245,31 +245,21 @@ class MyStrategy(Strategy):
 # 1. データサイズを確認
 print(f"データサイズ: {len(data)}")
 
-# 2. 戦略のロジックを確認
+# 2. 戦略のロジックを簡素化して切り分け
 class SimpleStrategy(Strategy):
     def init(self):
         pass
     
     def next(self):
-        # シンプルなロジックから開始
         if len(self.data) == 1:
             self.buy()
-            return  # 早期リターンで処理を終了
+            return
 
-# 3. タイムアウトを設定
-import signal
+# 3. 長時間実行を避けるためにデータ期間を短くする
+data = data.tail(2000)
 
-def timeout_handler(signum, frame):
-    raise TimeoutError("バックテストがタイムアウトしました")
-
-signal.signal(signal.SIGALRM, timeout_handler)
-signal.alarm(300)  # 5分でタイムアウト
-
-try:
-    bt = Backtest(data, SimpleStrategy)
-    results = bt.run()
-finally:
-    signal.alarm(0)  # タイムアウトを解除
+bt = Backtest(data, SimpleStrategy)
+results = bt.run()
 ```
 
 ### 問題: 結果が期待と異なる

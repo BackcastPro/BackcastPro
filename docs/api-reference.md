@@ -175,11 +175,8 @@ data = DataReader('7203')
 
 ### メソッド
 
-#### `close(size=None)`
-ポジションをクローズします。
-
-**パラメータ:**
-- `size` (float, optional): クローズするサイズ。Noneの場合は全量
+#### `close(portion: float = 1.0)`
+ポジションの一部または全量をクローズします（0 < portion ≤ 1）。
 
 ## Trade
 
@@ -194,7 +191,6 @@ data = DataReader('7203')
 - `exit_time`: エグジットタイム
 - `pl`: 損益
 - `pl_pct`: 損益率
-- `duration`: 保有期間
 - `is_long`: ロングトレードかどうか
 - `is_short`: ショートトレードかどうか
 - `sl`: ストップロス価格
@@ -202,11 +198,8 @@ data = DataReader('7203')
 
 ### メソッド
 
-#### `close(size=None)`
-トレードをクローズします。
-
-**パラメータ:**
-- `size` (float, optional): クローズするサイズ。Noneの場合は全量
+#### `close(portion: float = 1.0)`
+トレードの一部または全量をクローズします（0 < portion ≤ 1）。
 
 ## データ形式
 

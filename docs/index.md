@@ -18,10 +18,10 @@ BackcastProは、トレーディング戦略のためのPythonバックテスト
 
 ### サンプルコード
 
-- **[サンプル集](../docs/examples/)** - 実用的な戦略の例
-  - [クイックスタートガイド](../docs/examples/QuickStartUserGuide.py)
-  - [SMAクロス戦略](../docs/examples/SmaCross.py)
-  - [Streamlitアプリ](../docs/examples/Streamlit.py)
+- **[サンプル集](examples/)** - 実用的な戦略の例
+  - [クイックスタートガイド](examples/QuickStartUserGuide.py)
+  - [SMAクロス戦略](examples/SmaCross.py)
+  - [Streamlitアプリ](examples/Streamlit.py)
 
 ## クイックスタート
 
@@ -47,11 +47,21 @@ print(results)
 
 ## 主な機能
 
-- **簡単な戦略実装** - Strategyクラスを継承するだけ
-- **豊富なデータソース** - 日本株データの自動取得
-- **詳細な統計情報** - パフォーマンス指標の自動計算
-- **リスク管理** - ストップロス、テイクプロフィット対応
-- **可視化** - Streamlitによるインタラクティブな結果表示
+- **シンプルな戦略実装**: `Strategy` を継承して `init` と `next` を実装
+- **日本株データ取得**: `DataReader` と `JapanStocks` を提供
+- **統計の自動計算**: 代表的なパフォーマンス指標を同梱
+- **リスク管理**: `sl` と `tp` に標準対応
+- **可視化**: Streamlit 連携の例を提供
+
+```mermaid
+flowchart TD
+    A[データ取得 DataReader] --> B[Backtest 初期化]
+    B --> C[Strategy.init 前処理]
+    C --> D[Strategy.next ループ]
+    D --> E[_Broker 注文/約定]
+    E --> F[_stats 統計計算]
+    F --> G[結果 pd.Series]
+```
 
 ## サポート
 

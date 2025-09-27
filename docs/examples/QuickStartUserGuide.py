@@ -44,10 +44,12 @@ class SmaCross(Strategy):
 
 
 # データ取得とバックテスト実行
-from BackcastPro.data import TOYOTA
+from BackcastPro.data import DataReader
 from BackcastPro import Backtest
 
-bt = Backtest(TOYOTA, SmaCross, cash=10_000, commission=.002, finalize_trades=True)
+# データ取得（例: トヨタ 7203）
+data = DataReader('7203')
+bt = Backtest(data, SmaCross, cash=10_000, commission=.002, finalize_trades=True)
 stats = bt.run()
 print(stats)
 

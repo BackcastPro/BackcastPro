@@ -24,28 +24,26 @@ BackcastProの開発に参加するためのガイドです。
 ### セットアップ手順
 
 1. **リポジトリをクローン**
-```bash
+```powershell
 git clone https://github.com/BackcastPro/BackcastPro.git
 cd BackcastPro
 ```
 
 2. **仮想環境を作成**
-```bash
-python -m venv venv
-source venv/bin/activate  # Linux/Mac
-# または
-venv\Scripts\activate  # Windows
+```powershell
+py -m venv .venv
+.\.venv\Scripts\Activate.ps1
 ```
 
 3. **依存関係をインストール**
-```bash
-pip install -e .
-pip install -r requirements.txt
+```powershell
+py -m pip install -e .
+py -m pip install -r requirements.txt
 ```
 
 4. **開発用依存関係をインストール**
-```bash
-pip install pytest pytest-cov black flake8 mypy
+```powershell
+py -m pip install pytest pytest-cov black flake8 mypy
 ```
 
 ### VS Code設定
@@ -54,7 +52,7 @@ pip install pytest pytest-cov black flake8 mypy
 
 ```json
 {
-    "python.defaultInterpreterPath": "./venv/bin/python",
+    "python.defaultInterpreterPath": ".\\.venv\\Scripts\\python.exe",
     "python.linting.enabled": true,
     "python.linting.flake8Enabled": true,
     "python.formatting.provider": "black",
@@ -253,18 +251,18 @@ tests/
 
 ### テストの実行
 
-```bash
+```powershell
 # 全テストを実行
-pytest
+py -m pytest
 
 # カバレッジ付きで実行
-pytest --cov=BackcastPro
+py -m pytest --cov=BackcastPro
 
 # 特定のテストを実行
-pytest tests/test_backtest.py
+py -m pytest tests/test_backtest.py
 
 # 詳細な出力で実行
-pytest -v
+py -m pytest -v
 ```
 
 ### テストの書き方
@@ -423,8 +421,8 @@ PRを作成する際は以下を含めてください：
 ### リリース手順
 
 1. **バージョン更新**
-```bash
-# pyproject.tomlのversionを更新
+```toml
+# pyproject.toml の version を更新
 version = "0.1.0"
 ```
 
@@ -445,23 +443,23 @@ version = "0.1.0"
 ```
 
 3. **テスト実行**
-```bash
-pytest
-pytest --cov=BackcastPro
+```powershell
+py -m pytest
+py -m pytest --cov=BackcastPro
 ```
 
 4. **ビルド**
-```bash
-python -m build
+```powershell
+py -m build
 ```
 
 5. **PyPIにアップロード**
-```bash
-python -m twine upload dist/*
+```powershell
+py -m twine upload dist/*
 ```
 
 6. **Gitタグ作成**
-```bash
+```powershell
 git tag v0.1.0
 git push origin v0.1.0
 ```
