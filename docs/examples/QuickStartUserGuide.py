@@ -26,21 +26,13 @@ class SmaCross(Strategy):
         # short trades, and buy the asset
         if crossover(self.data.SMA1, self.data.SMA2):
             self.position.close()
-            # Calculate position size based on risk
-            stop_distance = 2.0 * self.data.ATR.iloc[-1]
-            units = position_size_by_risk(self.equity, 0.02, stop_distance)
-            if units > 0:
-                self.buy(size=units, sl=self.data.Close.iloc[-1] - stop_distance)
+            self.buy()
 
         # Else, if sma1 crosses below sma2, close any existing
         # long trades, and sell the asset
         elif crossover(self.data.SMA2, self.data.SMA1):
             self.position.close()
-            # Calculate position size based on risk
-            stop_distance = 2.0 * self.data.ATR.iloc[-1]
-            units = position_size_by_risk(self.equity, 0.02, stop_distance)
-            if units > 0:
-                self.sell(size=units, sl=self.data.Close.iloc[-1] + stop_distance)
+            self.sell()
 
 
 # データ取得とバックテスト実行
