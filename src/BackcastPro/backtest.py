@@ -221,6 +221,9 @@ class Backtest:
 
         strategy.init()
 
+        # strategy.init()で加工されたdataを再登録
+        self._data = data
+        
         # インジケーターがまだ「ウォームアップ」中の最初の数本のキャンドルをスキップ
         # 少なくとも2つのエントリが利用可能になるように+1
         start = 1

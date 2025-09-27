@@ -12,31 +12,31 @@ class SmaCross(Strategy):
     n2 = 20
     
     def init(self):
-        # Precompute the two moving averages
-        self.sma1 = self.data.Close.rolling(self.n1).mean()
-        self.sma2 = self.data.Close.rolling(self.n2).mean()
+        # Precompute the two moving averages and add to data
+        self.data['SMA1'] = self.data.Close.rolling(self.n1).mean()
+        self.data['SMA2'] = self.data.Close.rolling(self.n2).mean()
         
-        # Calculate RSI and ATR for risk management
-        self.rsi = calculate_rsi(self.data)
-        self.atr = calculate_atr(self.data)
+        # Calculate RSI and ATR for risk management and add to data
+        self.data['RSI'] = calculate_rsi(self.data)
+        self.data['ATR'] = calculate_atr(self.data)
     
     def next(self):
         # If sma1 crosses above sma2, close any existing
         # short trades, and buy the asset
-        if crossover(self.sma1, self.sma2):
+        if crossover(self.data.SMA1, self.data.SMA2):
             self.position.close()
             # Calculate position size based on risk
-            stop_distance = 2.0 * self.atr.iloc[-1]
+            stop_distance = 2.0 * self.data.ATR.iloc[-1]
             units = position_size_by_risk(self.equity, 0.02, stop_distance)
             if units > 0:
                 self.buy(size=units, sl=self.data.Close.iloc[-1] - stop_distance)
 
         # Else, if sma1 crosses below sma2, close any existing
         # long trades, and sell the asset
-        elif crossover(self.sma2, self.sma1):
+        elif crossover(self.data.SMA2, self.data.SMA1):
             self.position.close()
             # Calculate position size based on risk
-            stop_distance = 2.0 * self.atr.iloc[-1]
+            stop_distance = 2.0 * self.data.ATR.iloc[-1]
             units = position_size_by_risk(self.equity, 0.02, stop_distance)
             if units > 0:
                 self.sell(size=units, sl=self.data.Close.iloc[-1] + stop_distance)
