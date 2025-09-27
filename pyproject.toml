@@ -2,7 +2,7 @@
 name = "BackcastPro"
 version = "0.1.0"
 authors = [
-  { name="botterYosuke", email="yosuke.sasazawa@gmail.com" },
+  { name="botterYosuke" },
 ]
 description = "トレーディング戦略のためのPythonバックテストライブラリ"
 readme = "README.md"
