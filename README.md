@@ -28,7 +28,7 @@ pip install -e .
 
 ```python
 from BackcastPro import Strategy, Backtest
-from BackcastPro.lib import resample_apply
+from BackcastPro.data import DataReader, JapanStocks
 
 # ここにトレーディング戦略の実装を記述
 ```
