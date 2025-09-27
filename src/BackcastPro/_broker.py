@@ -131,7 +131,7 @@ class _Broker:
     @property
     def last_price(self) -> float:
         """ Price at the last (current) close. """
-        return self._data.Close[-1]
+        return self._data.Close.iloc[-1]
 
     def _adjusted_price(self, size=None, price=None) -> float:
         """
@@ -162,14 +162,14 @@ class _Broker:
         if equity <= 0:
             assert self.margin_available <= 0
             for trade in self.trades:
-                self._close_trade(trade, self._data.Close[-1], i)
+                self._close_trade(trade, self._data.Close.iloc[-1], i)
             self._cash = 0
             self._equity[i:] = 0
             raise Exception
 
     def _process_orders(self):
         data = self._data
-        open, high, low = data.Open[-1], data.High[-1], data.Low[-1]
+        open, high, low = data.Open.iloc[-1], data.High.iloc[-1], data.Low.iloc[-1]
         reprocess_orders = False
 
         # 注文を処理
@@ -210,7 +210,7 @@ class _Broker:
             else:
                 # 成行注文（Market-if-touched / market order）
                 # 条件付き注文は常に次の始値で
-                prev_close = data.Close[-2]
+                prev_close = data.Close.iloc[-2]
                 price = prev_close if self._trade_on_close and not order.is_contingent else open
                 if stop_price:
                     price = max(price, stop_price) if order.is_long else min(price, stop_price)
