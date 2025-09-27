@@ -26,7 +26,11 @@ var NAVTREE =
 [
   [ "BackcastPro", "index.html", [
     [ "名前空間", "namespaces.html", [
-      [ "名前空間一覧", "namespaces.html", "namespaces_dup" ]
+      [ "名前空間一覧", "namespaces.html", "namespaces_dup" ],
+      [ "名前空間メンバ", "namespacemembers.html", [
+        [ "全て", "namespacemembers.html", null ],
+        [ "関数", "namespacemembers_func.html", null ]
+      ] ]
     ] ],
     [ "クラス", "annotated.html", [
       [ "クラス一覧", "annotated.html", "annotated_dup" ],
@@ -34,15 +38,19 @@ var NAVTREE =
       [ "クラス階層", "hierarchy.html", "hierarchy" ],
       [ "クラスメンバ", "functions.html", [
         [ "全て", "functions.html", null ],
-        [ "関数", "functions_func.html", null ]
+        [ "関数", "functions_func.html", null ],
+        [ "変数", "functions_vars.html", null ]
       ] ]
+    ] ],
+    [ "ファイル", "files.html", [
+      [ "ファイル一覧", "files.html", "files_dup" ]
     ] ]
   ] ]
 ];
 
 var NAVTREEINDEX =
 [
-"annotated.html"
+"BackcastPro_2____init_____8py.html"
 ];
 
 var SYNCONMSG = 'クリックで同期表示が無効になります';

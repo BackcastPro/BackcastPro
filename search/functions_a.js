@@ -1,4 +1,4 @@
 var searchData=
 [
-  ['run_0',['run',['../classsrc_1_1BackcastPro_1_1backtest_1_1Backtest.html#ab2f892bba5cbe9ecaeb9aee56fb63c0a',1,'src::BackcastPro::backtest::Backtest']]]
+  ['orders_0',['orders',['../classsrc_1_1BackcastPro_1_1strategy_1_1Strategy.html#ac4376fa113cc2d1fb1eab9bb7ef320fb',1,'src::BackcastPro::strategy::Strategy']]]
 ];

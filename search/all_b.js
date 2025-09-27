@@ -1,16 +1,8 @@
 var searchData=
 [
-  ['sell_0',['sell',['../classsrc_1_1BackcastPro_1_1strategy_1_1Strategy.html#a4b836068df160ab40d71d121549ffc6f',1,'src::BackcastPro::strategy::Strategy']]],
-  ['size_1',['size',['../classsrc_1_1BackcastPro_1_1order_1_1Order.html#ad72001a8772807a6751a1b73fd0b7164',1,'src.BackcastPro.order.Order.size()'],['../classsrc_1_1BackcastPro_1_1position_1_1Position.html#a5bfba0cfd1167131de73a9e0e09fb48f',1,'src.BackcastPro.position.Position.size()'],['../classsrc_1_1BackcastPro_1_1trade_1_1Trade.html#a8490da4ea435aff6ccd37b8edf20cfca',1,'src.BackcastPro.trade.Trade.size()']]],
-  ['sl_2',['sl',['../classsrc_1_1BackcastPro_1_1order_1_1Order.html#a58acae23f1b9c01d47577d73454bc8c6',1,'src.BackcastPro.order.Order.sl()'],['../classsrc_1_1BackcastPro_1_1trade_1_1Trade.html#aafd21e1f979a29069e0f28c01a0dd7e2',1,'src.BackcastPro.trade.Trade.sl()']]],
-  ['src_3',['src',['../namespacesrc.html',1,'']]],
-  ['src_3a_3abackcastpro_4',['BackcastPro',['../namespacesrc_1_1BackcastPro.html',1,'src']]],
-  ['src_3a_3abackcastpro_3a_3a_5fbroker_5',['_broker',['../namespacesrc_1_1BackcastPro_1_1__broker.html',1,'src::BackcastPro']]],
-  ['src_3a_3abackcastpro_3a_3abacktest_6',['backtest',['../namespacesrc_1_1BackcastPro_1_1backtest.html',1,'src::BackcastPro']]],
-  ['src_3a_3abackcastpro_3a_3aorder_7',['order',['../namespacesrc_1_1BackcastPro_1_1order.html',1,'src::BackcastPro']]],
-  ['src_3a_3abackcastpro_3a_3aposition_8',['position',['../namespacesrc_1_1BackcastPro_1_1position.html',1,'src::BackcastPro']]],
-  ['src_3a_3abackcastpro_3a_3astrategy_9',['strategy',['../namespacesrc_1_1BackcastPro_1_1strategy.html',1,'src::BackcastPro']]],
-  ['src_3a_3abackcastpro_3a_3atrade_10',['trade',['../namespacesrc_1_1BackcastPro_1_1trade.html',1,'src::BackcastPro']]],
-  ['stop_11',['stop',['../classsrc_1_1BackcastPro_1_1order_1_1Order.html#a6f529e0d2d5b00812d228f688e3f0d56',1,'src::BackcastPro::order::Order']]],
-  ['strategy_12',['Strategy',['../classsrc_1_1BackcastPro_1_1strategy_1_1Strategy.html',1,'src::BackcastPro::strategy']]]
+  ['parent_5ftrade_0',['parent_trade',['../classsrc_1_1BackcastPro_1_1order_1_1Order.html#aa9b29d9d606975bc3c27892def244a19',1,'src::BackcastPro::order::Order']]],
+  ['pl_1',['pl',['../classsrc_1_1BackcastPro_1_1position_1_1Position.html#a38185e31f331ae5b7e1e44dcb3a7a6fc',1,'src.BackcastPro.position.Position.pl()'],['../classsrc_1_1BackcastPro_1_1trade_1_1Trade.html#aab015894ecf9e7298783579559ce8939',1,'src.BackcastPro.trade.Trade.pl()']]],
+  ['pl_5fpct_2',['pl_pct',['../classsrc_1_1BackcastPro_1_1position_1_1Position.html#a20b2fa49a8344fd6015e2e601939f573',1,'src.BackcastPro.position.Position.pl_pct()'],['../classsrc_1_1BackcastPro_1_1trade_1_1Trade.html#afb3fdd87b7fb1d143d5f7031f819682e',1,'src.BackcastPro.trade.Trade.pl_pct()']]],
+  ['position_3',['position',['../classsrc_1_1BackcastPro_1_1position_1_1Position.html',1,'src.BackcastPro.position.Position'],['../classsrc_1_1BackcastPro_1_1__broker_1_1__Broker.html#a02d77921a37611c64d85bb63142d426c',1,'src.BackcastPro._broker._Broker.position'],['../classsrc_1_1BackcastPro_1_1strategy_1_1Strategy.html#aa9a0f4de8a95fa2f95d53b698f909166',1,'src.BackcastPro.strategy.Strategy.position()']]],
+  ['position_2epy_4',['position.py',['../position_8py.html',1,'']]]
 ];
