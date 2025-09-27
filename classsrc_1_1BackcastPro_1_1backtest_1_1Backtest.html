@@ -1,0 +1,276 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "https://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="ja">
+<head>
+<meta http-equiv="Content-Type" content="text/xhtml;charset=UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=11"/>
+<meta name="generator" content="Doxygen 1.9.8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1"/>
+<title>FrameWeb: src.BackcastPro.backtest.Backtest クラス</title>
+<link href="tabs.css" rel="stylesheet" type="text/css"/>
+<script type="text/javascript" src="jquery.js"></script>
+<script type="text/javascript" src="dynsections.js"></script>
+<link href="navtree.css" rel="stylesheet" type="text/css"/>
+<script type="text/javascript" src="resize.js"></script>
+<script type="text/javascript" src="navtreedata.js"></script>
+<script type="text/javascript" src="navtree.js"></script>
+<link href="search/search.css" rel="stylesheet" type="text/css"/>
+<script type="text/javascript" src="search/searchdata.js"></script>
+<script type="text/javascript" src="search/search.js"></script>
+<script type="text/javascript">
+/* @license magnet:?xt=urn:btih:d3d9a9a6595521f9666a5e94cc830dab83b65699&amp;dn=expat.txt MIT */
+  $(document).ready(function() { init_search(); });
+/* @license-end */
+</script>
+<link href="doxygen.css" rel="stylesheet" type="text/css" />
+</head>
+<body>
+<div id="top"><!-- do not remove this div, it is closed by doxygen! -->
+<div id="titlearea">
+<table cellspacing="0" cellpadding="0">
+ <tbody>
+ <tr id="projectrow">
+  <td id="projectalign">
+   <div id="projectname">FrameWeb
+   </div>
+  </td>
+    <td>        <div id="MSearchBox" class="MSearchBoxInactive">
+        <span class="left">
+          <span id="MSearchSelect"                onmouseover="return searchBox.OnSearchSelectShow()"                onmouseout="return searchBox.OnSearchSelectHide()">&#160;</span>
+          <input type="text" id="MSearchField" value="" placeholder="検索" accesskey="S"
+               onfocus="searchBox.OnSearchFieldFocus(true)" 
+               onblur="searchBox.OnSearchFieldFocus(false)" 
+               onkeyup="searchBox.OnSearchFieldChange(event)"/>
+          </span><span class="right">
+            <a id="MSearchClose" href="javascript:searchBox.CloseResultsWindow()"><img id="MSearchCloseImg" border="0" src="search/close.svg" alt=""/></a>
+          </span>
+        </div>
+</td>
+ </tr>
+ </tbody>
+</table>
+</div>
+<!-- end header part -->
+<!-- 構築: Doxygen 1.9.8 -->
+<script type="text/javascript">
+/* @license magnet:?xt=urn:btih:d3d9a9a6595521f9666a5e94cc830dab83b65699&amp;dn=expat.txt MIT */
+var searchBox = new SearchBox("searchBox", "search/",'.html');
+/* @license-end */
+</script>
+</div><!-- top -->
+<div id="side-nav" class="ui-resizable side-nav-resizable">
+  <div id="nav-tree">
+    <div id="nav-tree-contents">
+      <div id="nav-sync" class="sync"></div>
+    </div>
+  </div>
+  <div id="splitbar" style="-moz-user-select:none;" 
+       class="ui-resizable-handle">
+  </div>
+</div>
+<script type="text/javascript">
+/* @license magnet:?xt=urn:btih:d3d9a9a6595521f9666a5e94cc830dab83b65699&amp;dn=expat.txt MIT */
+$(document).ready(function(){initNavTree('classsrc_1_1BackcastPro_1_1backtest_1_1Backtest.html',''); initResizable(); });
+/* @license-end */
+</script>
+<div id="doc-content">
+<!-- window showing the filter options -->
+<div id="MSearchSelectWindow"
+     onmouseover="return searchBox.OnSearchSelectShow()"
+     onmouseout="return searchBox.OnSearchSelectHide()"
+     onkeydown="return searchBox.OnSearchSelectKey(event)">
+</div>
+
+<!-- iframe showing the search results (closed by default) -->
+<div id="MSearchResultsWindow">
+<div id="MSearchResults">
+<div class="SRPage">
+<div id="SRIndex">
+<div id="SRResults"></div>
+<div class="SRStatus" id="Loading">読み取り中…</div>
+<div class="SRStatus" id="Searching">検索中…</div>
+<div class="SRStatus" id="NoMatches">一致する文字列を見つけられません</div>
+</div>
+</div>
+</div>
+</div>
+
+<div class="header">
+  <div class="summary">
+<a href="#pub-methods">公開メンバ関数</a> &#124;
+<a href="#pro-attribs">限定公開変数類</a> &#124;
+<a href="classsrc_1_1BackcastPro_1_1backtest_1_1Backtest-members.html">全メンバ一覧</a>  </div>
+  <div class="headertitle"><div class="title">src.BackcastPro.backtest.Backtest クラス</div></div>
+</div><!--header-->
+<div class="contents">
+<table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="pub-methods" name="pub-methods"></a>
+公開メンバ関数</h2></td></tr>
+<tr class="memitem:abf83c117de76b2917f07c804c6145e36" id="r_abf83c117de76b2917f07c804c6145e36"><td class="memItemLeft" align="right" valign="top"><a id="abf83c117de76b2917f07c804c6145e36" name="abf83c117de76b2917f07c804c6145e36"></a>
+&#160;</td><td class="memItemRight" valign="bottom"><b>__init__</b> (self, pd.DataFrame data, Type strategy, *float cash=10_000, float spread=.0, Union[float, Tuple[float, float]] commission=.0, float margin=1., trade_on_close=False, hedging=False, exclusive_orders=False, finalize_trades=False)</td></tr>
+<tr class="separator:abf83c117de76b2917f07c804c6145e36"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ab2f892bba5cbe9ecaeb9aee56fb63c0a" id="r_ab2f892bba5cbe9ecaeb9aee56fb63c0a"><td class="memItemLeft" align="right" valign="top">pd.Series&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classsrc_1_1BackcastPro_1_1backtest_1_1Backtest.html#ab2f892bba5cbe9ecaeb9aee56fb63c0a">run</a> (self)</td></tr>
+<tr class="separator:ab2f892bba5cbe9ecaeb9aee56fb63c0a"><td class="memSeparator" colspan="2">&#160;</td></tr>
+</table><table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="pro-attribs" name="pro-attribs"></a>
+限定公開変数類</h2></td></tr>
+<tr class="memitem:a19c98637dc3e3595abfea915e4e8fea7" id="r_a19c98637dc3e3595abfea915e4e8fea7"><td class="memItemLeft" align="right" valign="top"><a id="a19c98637dc3e3595abfea915e4e8fea7" name="a19c98637dc3e3595abfea915e4e8fea7"></a>
+&#160;</td><td class="memItemRight" valign="bottom"><b>_broker</b></td></tr>
+<tr class="separator:a19c98637dc3e3595abfea915e4e8fea7"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a74bb1e6cd13f9fa40f0add8065237dc6" id="r_a74bb1e6cd13f9fa40f0add8065237dc6"><td class="memItemLeft" align="right" valign="top"><a id="a74bb1e6cd13f9fa40f0add8065237dc6" name="a74bb1e6cd13f9fa40f0add8065237dc6"></a>
+&#160;</td><td class="memItemRight" valign="bottom"><b>_strategy</b></td></tr>
+<tr class="separator:a74bb1e6cd13f9fa40f0add8065237dc6"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a63c387f535ad7b89a12dd70735360608" id="r_a63c387f535ad7b89a12dd70735360608"><td class="memItemLeft" align="right" valign="top"><a id="a63c387f535ad7b89a12dd70735360608" name="a63c387f535ad7b89a12dd70735360608"></a>
+&#160;</td><td class="memItemRight" valign="bottom"><b>_finalize_trades</b></td></tr>
+<tr class="separator:a63c387f535ad7b89a12dd70735360608"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:af9ed7b08fa1d28aa55f76449e21979e8" id="r_af9ed7b08fa1d28aa55f76449e21979e8"><td class="memItemLeft" align="right" valign="top"><a id="af9ed7b08fa1d28aa55f76449e21979e8" name="af9ed7b08fa1d28aa55f76449e21979e8"></a>
+&#160;</td><td class="memItemRight" valign="bottom"><b>_cash</b></td></tr>
+<tr class="separator:af9ed7b08fa1d28aa55f76449e21979e8"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a115d6912507ca11632fa956477dcacb4" id="r_a115d6912507ca11632fa956477dcacb4"><td class="memItemLeft" align="right" valign="top"><a id="a115d6912507ca11632fa956477dcacb4" name="a115d6912507ca11632fa956477dcacb4"></a>
+&#160;</td><td class="memItemRight" valign="bottom"><b>_commission</b></td></tr>
+<tr class="separator:a115d6912507ca11632fa956477dcacb4"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a6c41a2809af43c500a597fc437c0cc91" id="r_a6c41a2809af43c500a597fc437c0cc91"><td class="memItemLeft" align="right" valign="top"><a id="a6c41a2809af43c500a597fc437c0cc91" name="a6c41a2809af43c500a597fc437c0cc91"></a>
+&#160;</td><td class="memItemRight" valign="bottom"><b>_data</b></td></tr>
+<tr class="separator:a6c41a2809af43c500a597fc437c0cc91"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a801f40087845261d0e7a1a2d130b9769" id="r_a801f40087845261d0e7a1a2d130b9769"><td class="memItemLeft" align="right" valign="top"><a id="a801f40087845261d0e7a1a2d130b9769" name="a801f40087845261d0e7a1a2d130b9769"></a>
+&#160;</td><td class="memItemRight" valign="bottom"><b>_results</b></td></tr>
+<tr class="separator:a801f40087845261d0e7a1a2d130b9769"><td class="memSeparator" colspan="2">&#160;</td></tr>
+</table>
+<a name="details" id="details"></a><h2 class="groupheader">詳解</h2>
+<div class="textblock"><pre class="fragment">特定のデータに対して特定の（パラメータ化された）戦略をバックテストします。
+
+バックテストを初期化します。テストするデータと戦略が必要です。
+初期化後、バックテストインスタンスを実行するために
+`Backtest.run`メソッドを呼び出す。
+
+`data`は以下の列を持つ`pd.DataFrame`です：
+`Open`, `High`, `Low`, `Close`, および（オプションで）`Volume`。
+列が不足している場合は、利用可能なものに設定してください。
+例：
+
+    df['Open'] = df['High'] = df['Low'] = df['Close']
+
+渡されたデータフレームには、戦略で使用できる追加の列
+（例：センチメント情報）を含めることができます。
+DataFrameのインデックスは、datetimeインデックス（タイムスタンプ）または
+単調増加の範囲インデックス（期間のシーケンス）のいずれかです。
+
+`strategy`は`Strategy`の
+_サブクラス_（インスタンスではありません）です。
+
+`cash`は開始時の初期現金です。
+
+`spread`は一定のビッドアスクスプレッド率（価格に対する相対値）です。
+例：平均スプレッドがアスク価格の約0.2‰である手数料なしの
+外国為替取引では`0.0002`に設定してください。
+
+`commission`は手数料率です。例：ブローカーの手数料が
+注文価値の1%の場合、commissionを`0.01`に設定してください。
+手数料は2回適用されます：取引開始時と取引終了時です。
+単一の浮動小数点値に加えて、`commission`は浮動小数点値の
+タプル`(fixed, relative)`にすることもできます。例：ブローカーが
+最低$100 + 1%を請求する場合は`(100, .01)`に設定してください。
+さらに、`commission`は呼び出し可能な
+`func(order_size: int, price: float) -&gt; float`
+（注：ショート注文では注文サイズは負の値）にすることもでき、
+より複雑な手数料構造をモデル化するために使用できます。
+負の手数料値はマーケットメーカーのリベートとして解釈されます。
+
+`margin`はレバレッジアカウントの必要証拠金（比率）です。
+初期証拠金と維持証拠金の区別はありません。
+ブローカーが許可する50:1レバレッジなどでバックテストを実行するには、
+marginを`0.02`（1 / レバレッジ）に設定してください。
+
+`trade_on_close`が`True`の場合、成行注文は
+次のバーの始値ではなく、現在のバーの終値で約定されます。
+
+`hedging`が`True`の場合、両方向の取引を同時に許可します。
+`False`の場合、反対方向の注文は既存の取引を
+[FIFO]方式で最初にクローズします。
+
+`exclusive_orders`が`True`の場合、各新しい注文は前の
+取引/ポジションを自動クローズし、各時点で最大1つの取引
+（ロングまたはショート）のみが有効になります。
+
+`finalize_trades`が`True`の場合、バックテスト終了時に
+まだ[アクティブで継続中]の取引は最後のバーでクローズされ、
+計算されたバックテスト統計に貢献します。
+</pre> </div><h2 class="groupheader">関数詳解</h2>
+<a id="ab2f892bba5cbe9ecaeb9aee56fb63c0a" name="ab2f892bba5cbe9ecaeb9aee56fb63c0a"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ab2f892bba5cbe9ecaeb9aee56fb63c0a">&#9670;&#160;</a></span>run()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"> pd.Series src.BackcastPro.backtest.Backtest.run </td>
+          <td>(</td>
+          <td class="paramtype">&#160;</td>
+          <td class="paramname"><em>self</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<pre class="fragment">バックテストを実行します。結果と統計を含む `pd.Series` を返します。
+
+キーワード引数は戦略パラメータとして解釈されます。
+
+    &gt;&gt;&gt; Backtest(GOOG, SmaCross).run()
+    Start                     2004-08-19 00:00:00
+    End                       2013-03-01 00:00:00
+    Duration                   3116 days 00:00:00
+    Exposure Time [%]                    96.74115
+    Equity Final [$]                     51422.99
+    Equity Peak [$]                      75787.44
+    Return [%]                           414.2299
+    Buy &amp; Hold Return [%]               703.45824
+    Return (Ann.) [%]                    21.18026
+    Volatility (Ann.) [%]                36.49391
+    CAGR [%]                             14.15984
+    Sharpe Ratio                          0.58038
+    Sortino Ratio                         1.08479
+    Calmar Ratio                          0.44144
+    Alpha [%]                           394.37391
+    Beta                                  0.03803
+    Max. Drawdown [%]                   -47.98013
+    Avg. Drawdown [%]                    -5.92585
+    Max. Drawdown Duration      584 days 00:00:00
+    Avg. Drawdown Duration       41 days 00:00:00
+    # Trades                                   66
+    Win Rate [%]                          46.9697
+    Best Trade [%]                       53.59595
+    Worst Trade [%]                     -18.39887
+    Avg. Trade [%]                        2.53172
+    Max. Trade Duration         183 days 00:00:00
+    Avg. Trade Duration          46 days 00:00:00
+    Profit Factor                         2.16795
+    Expectancy [%]                        3.27481
+    SQN                                   1.07662
+    Kelly Criterion                       0.15187
+    _strategy                            SmaCross
+    _equity_curve                           Eq...
+    _trades                       Size  EntryB...
+    dtype: object
+
+.. warning::
+    異なる戦略パラメータに対して異なる結果が得られる場合があります。
+    例：50本と200本のSMAを使用する場合、取引シミュレーションは
+    201本目から開始されます。実際の遅延の長さは、最も遅延する
+    `Strategy.I`インジケーターのルックバック期間に等しくなります。
+    明らかに、これは結果に影響を与える可能性があります。
+</pre> 
+</div>
+</div>
+<hr/>このクラス詳解は次のファイルから抽出されました:<ul>
+<li>src/BackcastPro/<b>backtest.py</b></li>
+</ul>
+</div><!-- contents -->
+</div><!-- doc-content -->
+<!-- start footer part -->
+<div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->
+  <ul>
+    <li class="navelem"><a class="el" href="namespacesrc.html">src</a></li><li class="navelem"><a class="el" href="namespacesrc_1_1BackcastPro.html">BackcastPro</a></li><li class="navelem"><a class="el" href="namespacesrc_1_1BackcastPro_1_1backtest.html">backtest</a></li><li class="navelem"><a class="el" href="classsrc_1_1BackcastPro_1_1backtest_1_1Backtest.html">Backtest</a></li>
+    <li class="footer">構築: <a href="https://www.doxygen.org/index.html"><img class="footer" src="doxygen.svg" width="104" height="31" alt="doxygen"/></a> 1.9.8 </li>
+  </ul>
+</div>
+</body>
+</html>
