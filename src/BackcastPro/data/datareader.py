@@ -90,8 +90,8 @@ def DataReader(code: str,
             df['Date'] = pd.to_datetime(df['Date'])
             df.set_index('Date', inplace=True)
         elif 'date' in df.columns:
-            df['date'] = pd.to_datetime(df['date'])
-            df.set_index('date', inplace=True)
+            df['Date'] = pd.to_datetime(df['date'])
+            df.set_index('Date', inplace=True)
         elif df.index.name is None or df.index.name == 'index':
             # If no date column, try to parse index as datetime
             try:
@@ -100,7 +100,7 @@ def DataReader(code: str,
                 pass
         
         # Ensure numeric columns are properly typed
-        numeric_columns = ['Open', 'High', 'Low', 'Close', 'Volume', 'open', 'high', 'low', 'close', 'volume']
+        numeric_columns = ['Open', 'High', 'Low', 'Close', 'Volume']
         for col in numeric_columns:
             if col in df.columns:
                 df[col] = pd.to_numeric(df[col], errors='coerce')
