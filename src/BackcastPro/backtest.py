@@ -9,6 +9,7 @@ from typing import Optional, Tuple, Type, Union
 
 import numpy as np
 import pandas as pd
+from tqdm import tqdm # プログレスバー
 
 from ._broker import _Broker
 from ._stats import compute_stats
@@ -228,7 +229,15 @@ class Backtest:
         # np.nan >= 3は無効ではない；Falseです。
         with np.errstate(invalid='ignore'):
 
-            for i in range(start, len(self._data)):
+            # プログレスバーを表示
+            progress_bar = tqdm(range(start, len(self._data)), 
+                              desc="バックテスト実行中", 
+                              unit="step",
+                              ncols=120,
+                              leave=True,
+                              dynamic_ncols=True)
+            
+            for i in progress_bar:
                 # 注文処理とブローカー関連の処理
                 data = self._data.iloc[:i]
                 try:
@@ -240,6 +249,14 @@ class Backtest:
                 # 次のティック、バークローズ直前
                 strategy._data = data
                 strategy.next()
+                
+                # プログレスバーの説明を更新（現在の日付を表示）
+                if hasattr(self._data.index, 'strftime') and i > 0:
+                    try:
+                        current_date = self._data.index[i-1].strftime('%Y-%m-%d')
+                        progress_bar.set_postfix({"日付": current_date})
+                    except:
+                        pass
             else:
                 if self._finalize_trades is True:
                     # 統計を生成するために残っているオープン取引をクローズ
