@@ -111,7 +111,7 @@ BackcastPro/
 ### データフロー
 
 ```
-1. データ取得 (DataReader)
+1. データ取得
    ↓
 2. 戦略初期化 (Strategy.init)
    ↓
@@ -271,7 +271,6 @@ py -m pytest -v
 import pytest
 import pandas as pd
 from BackcastPro import Backtest, Strategy
-from BackcastPro.data import DataReader
 
 class TestStrategy(Strategy):
     def init(self):

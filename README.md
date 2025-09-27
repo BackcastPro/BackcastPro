@@ -31,7 +31,6 @@ py -m pip install -r requirements.txt
 
 ```python
 from BackcastPro import Strategy, Backtest
-from BackcastPro.data import DataReader, JapanStocks
 
 # ここにトレーディング戦略の実装を記述
 ```

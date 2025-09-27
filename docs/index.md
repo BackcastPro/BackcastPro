@@ -8,7 +8,6 @@ BackcastProは、トレーディング戦略のためのPythonバックテスト
 
 - **[チュートリアル](tutorial.md)** - 基本的な使い方を学ぶ
 - **[APIリファレンス](api-reference.md)** - クラスとメソッドの詳細
-- **[高度な使い方](advanced-usage.md)** - 高度な機能とテクニック
 - **[トラブルシューティング](troubleshooting.md)** - よくある問題と解決方法
 
 ### 開発者向けドキュメント
@@ -26,8 +25,8 @@ BackcastProは、トレーディング戦略のためのPythonバックテスト
 ## クイックスタート
 
 ```python
+import pandas_datareader.data as web
 from BackcastPro import Strategy, Backtest
-from BackcastPro.data import DataReader
 
 # シンプルな買い持ち戦略
 class BuyAndHold(Strategy):
@@ -39,7 +38,7 @@ class BuyAndHold(Strategy):
             self.buy()
 
 # データを取得してバックテストを実行
-data = DataReader('7203')  # トヨタ
+data = web.DataReader('7203.JP', 'stooq')  # トヨタ
 bt = Backtest(data, BuyAndHold, cash=10000)
 results = bt.run()
 print(results)
@@ -48,14 +47,13 @@ print(results)
 ## 主な機能
 
 - **シンプルな戦略実装**: `Strategy` を継承して `init` と `next` を実装
-- **日本株データ取得**: `DataReader` と `JapanStocks` を提供
 - **統計の自動計算**: 代表的なパフォーマンス指標を同梱
 - **リスク管理**: `sl` と `tp` に標準対応
 - **可視化**: Streamlit 連携の例を提供
 
 ```mermaid
 flowchart TD
-    A[データ取得 DataReader] --> B[Backtest 初期化]
+    A[データ取得] --> B[Backtest 初期化]
     B --> C[Strategy.init 前処理]
     C --> D[Strategy.next ループ]
     D --> E[_Broker 注文/約定]

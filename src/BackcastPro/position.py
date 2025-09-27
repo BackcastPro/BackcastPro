@@ -18,6 +18,7 @@ class Position:
         if self.position:
             ...  # ポジションがあります（ロングまたはショート）
     """
+    
     def __init__(self, broker: '_Broker'):
         self.__broker = broker
 

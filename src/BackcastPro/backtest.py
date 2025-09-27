@@ -76,6 +76,7 @@ class Backtest:
     まだ[アクティブで継続中]の取引は最後のバーでクローズされ、
     計算されたバックテスト統計に貢献します。
     """  
+    
     def __init__(self,
                  data: pd.DataFrame,
                  strategy: Type,

@@ -21,6 +21,7 @@ class Order:
 
     すべての出された注文は[取消注文まで有効]です。
     """
+    
     def __init__(self, broker: '_Broker',
                  size: float,
                  limit_price: Optional[float] = None,

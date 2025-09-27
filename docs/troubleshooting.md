@@ -130,19 +130,16 @@ custom_data = pd.DataFrame({
 
 **解決方法:**
 ```python
-# 1. 銘柄コードを確認
-from BackcastPro.data import JapanStocks
-stocks = JapanStocks()
-print("利用可能な銘柄:", stocks.head())
+import pandas_datareader.data as web
 
-# 2. 期間を確認
+# 1. 期間を確認
 from datetime import datetime, timedelta
 end_date = datetime.now()
 start_date = end_date - timedelta(days=365)
 print(f"期間: {start_date} から {end_date}")
 
-# 3. 異なる銘柄で試す
-data = DataReader('7203')  # トヨタ
+# 2. 異なる銘柄で試す
+data = web.DataReader('7203.JP', 'stooq')  # トヨタ
 if data is None or len(data) == 0:
     print("データが取得できませんでした")
 ```

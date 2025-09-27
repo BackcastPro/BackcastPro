@@ -27,7 +27,7 @@ sequenceDiagram
     participant B as Backtest
     participant S as Strategy
     participant R as Results
-    U->>D: DataReader("7203")
+    U->>D: DataReader('7203.JP', 'stooq')
     D-->>U: OHLCV DataFrame
     U->>B: Backtest(data, Strategy)
     B->>S: init()
@@ -42,7 +42,6 @@ sequenceDiagram
 
 ```python
 from BackcastPro import Strategy, Backtest
-from BackcastPro.data import DataReader
 import pandas as pd
 ```
 
@@ -50,7 +49,7 @@ import pandas as pd
 
 ```python
 # トヨタの株価データを取得
-data = DataReader('7203')
+data = web.DataReader('7203.JP', 'stooq')
 print(data.head())
 ```
 
@@ -86,11 +85,11 @@ print(results)
 ### 日本株データの取得
 
 ```python
-from BackcastPro.data import DataReader, JapanStocks
+import pandas_datareader.data as web
 
 # 特定の銘柄のデータを取得
-toyota_data = DataReader('7203')  # トヨタ
-sony_data = DataReader('6758')    # ソニー
+toyota_data = web.DataReader('7203.JP', 'stooq') # トヨタ
+sony_data = web.DataReader('6758.JP', 'stooq')   # ソニー
 
 # 期間を指定してデータを取得
 from datetime import datetime, timedelta
@@ -98,19 +97,7 @@ from datetime import datetime, timedelta
 end_date = datetime.now()
 start_date = end_date - timedelta(days=365)  # 1年前
 
-data = DataReader('7203', start_date, end_date)
-```
-
-### 銘柄リストの取得
-
-```python
-# 日本株の銘柄リストを取得
-stocks = JapanStocks()
-print(stocks.head())
-
-# 特定の条件でフィルタリング
-toyota_info = stocks[stocks['code'] == '7203']
-print(toyota_info)
+data = web.DataReader('7203.JP', 'stooq', start_date, end_date)
 ```
 
 ### カスタムデータの使用
