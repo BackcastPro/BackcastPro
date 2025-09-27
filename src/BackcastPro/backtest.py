@@ -161,6 +161,10 @@ class Backtest:
         self._strategy = strategy
         self._results: Optional[pd.Series] = None
         self._finalize_trades = bool(finalize_trades)
+        
+        # 初期化パラメータを保存（実行後に振り返るため）
+        self._cash = cash
+        self._commission = commission
 
     def run(self) -> pd.Series:
         """

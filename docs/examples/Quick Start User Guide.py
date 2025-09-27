@@ -52,5 +52,5 @@ stats = bt.run()
 print(stats)
 
 # Streamlit で表示
-filename_without_ext = os.path.splitext(os.path.basename(__file__))[0]
-plot(filename_without_ext, bt)
+page_title = os.path.splitext(os.path.basename(__file__))[0]
+plot(page_title, bt)
