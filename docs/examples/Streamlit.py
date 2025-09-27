@@ -6,7 +6,7 @@ from datetime import datetime, timedelta
 
 import streamlit as st
 
-from BackcastPro import Strategy, Backtest
+from BackcastPro import Backtest, _broker
 from BackcastPro.data import DataReader
 
 
@@ -17,13 +17,14 @@ def plot(page_title: str, bt: Backtest) -> None:
 
     stats = bt._results
     data = bt._data
+    broker = bt._broker
 
     with st.sidebar:
         st.header('設定')
         code = st.text_input('銘柄コード', value=data['code'].iloc[0] if len(data) > 0 and 'code' in data.columns else '72030')
         years = st.slider('取得年数', min_value=1, max_value=10, value=1)
-        cash = st.number_input('初期資金', value=bt._broker._cash, step=1000)
-        commission = st.number_input('手数料（率）', value=bt._broker._commission, step=0.001, format='%.4f')
+        cash = st.number_input('初期資金', value=broker.cash, step=1000)
+        commission = st.number_input('手数料（率）', value=broker.commission, step=0.001, format='%.4f')
         run = st.button('実行')
 
     if run:

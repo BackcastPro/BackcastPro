@@ -47,7 +47,7 @@ class SmaCross(Strategy):
 from BackcastPro.data import TOYOTA
 from BackcastPro import Backtest
 
-bt = Backtest(TOYOTA, SmaCross, cash=10_000, commission=.002)
+bt = Backtest(TOYOTA, SmaCross, cash=10_000, commission=.002, finalize_trades=True)
 stats = bt.run()
 print(stats)
 

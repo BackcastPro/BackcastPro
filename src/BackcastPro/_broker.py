@@ -167,6 +167,14 @@ class _Broker:
         margin_used = sum(trade.value / self._leverage for trade in self.trades)
         return max(0, self.equity - margin_used)
 
+    @property
+    def cash(self):
+        return self._cash
+
+    @property
+    def commission(self):
+        return self._commission
+
     def next(self):
         i = self._i = len(self._data) - 1
         self._process_orders()
