@@ -24,13 +24,9 @@
 */
 var NAVTREE =
 [
-  [ "FrameWeb", "index.html", [
+  [ "BackcastPro", "index.html", [
     [ "名前空間", "namespaces.html", [
-      [ "名前空間一覧", "namespaces.html", "namespaces_dup" ],
-      [ "名前空間メンバ", "namespacemembers.html", [
-        [ "全て", "namespacemembers.html", null ],
-        [ "関数", "namespacemembers_func.html", null ]
-      ] ]
+      [ "名前空間一覧", "namespaces.html", "namespaces_dup" ]
     ] ],
     [ "クラス", "annotated.html", [
       [ "クラス一覧", "annotated.html", "annotated_dup" ],
