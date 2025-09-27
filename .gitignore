@@ -1,11 +1,24 @@
-__pycache__
-.pytest_cache
-.env
+*.py[cod]
+*.html
+*.png
+_version.py
 
-.pypirc
 *.egg-info
 .eggs/*
 __pycache__/*
-dist
+dist/*
 
-*.html
+.coverage
+.coverage.*
+htmlcov/*
+
+doc/build/*
+build/*
+
+.idea/*
+.vscode/
+
+**/.ipynb_checkpoints
+*~*
+
+.venv/

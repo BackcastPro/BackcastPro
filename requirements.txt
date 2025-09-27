@@ -1,11 +1,2 @@
-pandas>=1.3.0
-numpy>=1.20.0
-matplotlib>=3.0.0
-scipy>=1.7.0
-
-
-bokeh>=2.0.0 # 描画、レンダリング、イベント処理を処理します
-
-
 # To run example notebooks, install required and test dependencies
-streamlit>=1.50.0
+.[test]
