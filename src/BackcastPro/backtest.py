@@ -162,9 +162,6 @@ class Backtest:
         self._results: Optional[pd.Series] = None
         self._finalize_trades = bool(finalize_trades)
         
-        # 初期化パラメータを保存（実行後に振り返るため）
-        self._cash = cash
-        self._commission = commission
 
     def run(self) -> pd.Series:
         """
@@ -291,3 +288,14 @@ class Backtest:
 
         return self._results
 
+
+    @property
+    def cash(self):
+        # partialで初期化されている場合、初期化時のcash値を返す
+        return self._broker.keywords.get('cash', 0)
+
+   
+    @property
+    def commission(self):
+        # partialで初期化されている場合、初期化時のcommission値を返す
+        return self._broker.keywords.get('commission', 0)   

@@ -2,12 +2,13 @@ import sys
 sys.path.append('../../src')
 
 import pandas as pd
+import pandas_datareader.data as web
+
 from datetime import datetime, timedelta
 
 import streamlit as st
 
 from BackcastPro import Backtest
-from BackcastPro.data import DataReader
 
 
 def plot(page_title: str, bt: Backtest) -> None:
@@ -23,8 +24,8 @@ def plot(page_title: str, bt: Backtest) -> None:
         st.header('設定')
         code = st.text_input('銘柄コード', value=code)
         years = st.slider('取得年数', min_value=1, max_value=10, value=1)
-        cash = st.number_input('初期資金', value=bt._cash, step=1000)
-        commission = st.number_input('手数料（率）', value=bt._commission, step=0.001, format='%.4f')
+        cash = st.number_input('初期資金', value=bt.cash, step=1000)
+        commission = st.number_input('手数料（率）', value=bt.commission, step=0.001, format='%.4f')
         run = st.button('実行')
 
     if run:
@@ -32,7 +33,7 @@ def plot(page_title: str, bt: Backtest) -> None:
         start_date = end_date - timedelta(days=365 * years)
 
         with st.spinner('データ取得中...'):
-            data = DataReader(code, start_date, end_date)
+            data = web.DataReader(code, 'stooq', start_date, end_date)
 
         if data is None or len(data) == 0:
             st.error('データが取得できませんでした。コードや期間を確認してください。')

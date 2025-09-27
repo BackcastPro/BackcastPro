@@ -10,3 +10,4 @@ tqdm>=4.62.0
 
 # To run example notebooks, install required and test dependencies
 streamlit>=1.50.0
+pandas-datareader==0.10.0

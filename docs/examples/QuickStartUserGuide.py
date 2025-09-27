@@ -2,8 +2,10 @@ import os
 import sys
 sys.path.append('../../src')
 
+import pandas_datareader.data as web
+
 from BackcastPro import Strategy
-from SmaCross import crossover, calculate_rsi, calculate_atr, position_size_by_risk
+from SmaCross import crossover, calculate_rsi, calculate_atr
 from Streamlit import plot
 
 class SmaCross(Strategy):
@@ -36,15 +38,17 @@ class SmaCross(Strategy):
 
 
 # データ取得とバックテスト実行
-from BackcastPro.data import DataReader
 from BackcastPro import Backtest
 
 # データ取得（例: トヨタ 7203）
-data = DataReader('7203')
-bt = Backtest(data, SmaCross, cash=10_000, commission=.002, finalize_trades=True)
+df = web.DataReader('7203.JP', 'stooq')
+bt = Backtest(df, SmaCross, cash=10_000, commission=.002, finalize_trades=True)
 stats = bt.run()
 print(stats)
 
 # Streamlit で表示
 page_title = os.path.splitext(os.path.basename(__file__))[0]
 plot(page_title, bt)
+
+
+
