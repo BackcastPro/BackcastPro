@@ -35,7 +35,7 @@ from BackcastPro.data import DataReader, JapanStocks
 
 ## ドキュメント
 
-- [PyPIへのデプロイ方法](./docs/How%20to%20deploy%20to%20PyPI.md)
+- [PyPIへのデプロイ方法](./docs/how-to-deploy-to-PyPI.md)
 - [サンプル](./docs/examples/)
 
 ## バグ報告
