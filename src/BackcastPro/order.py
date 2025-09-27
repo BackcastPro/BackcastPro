@@ -20,9 +20,6 @@ class Order:
     キャンセルして新しい注文を出してください。
 
     すべての出された注文は[取消注文まで有効]です。
-
-    [filled]: https://www.investopedia.com/terms/f/fill.asp
-    [Good 'Til Canceled]: https://www.investopedia.com/terms/g/gtc.asp
     """
     def __init__(self, broker: '_Broker',
                  size: float,

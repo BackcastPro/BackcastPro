@@ -19,15 +19,32 @@ if TYPE_CHECKING:
 
 class _Broker:
     """
-    data
-    cash
-    spread
-    commission
-    margin
-    trade_on_close
-    hedging
-    exclusive_orders
-    index
+    バックテストにおける証券取引の実行、注文管理、ポジション管理、損益計算を担当します。
+    実際の証券会社のブローカー機能をシミュレートし、リアルな取引環境を提供します。
+    
+    Parameters
+    ----------
+    data : pd.DataFrame
+        取引対象の価格データ。Open, High, Low, Closeの列を持つ必要があります。
+    cash : float
+        初期現金残高。正の値である必要があります。
+    spread : float
+        ビッドアスクスプレッド（買値と売値の差）。取引コストとして使用されます。
+    commission : float or tuple or callable
+        手数料の設定方法：
+        - float: 相対手数料（例: 0.001 = 0.1%）
+        - tuple: (固定手数料, 相対手数料) の組み合わせ
+        - callable: カスタム手数料計算関数 (size, price) -> 手数料
+    margin : float
+        必要証拠金率（0 < margin <= 1）。レバレッジ = 1/margin として計算されます。
+    trade_on_close : bool
+        取引を終値で実行するかどうか。Trueの場合、次の始値ではなく現在の終値で取引します。
+    hedging : bool
+        ヘッジングモードの有効化。Trueの場合、反対方向のポジションを同時に保有できます。
+    exclusive_orders : bool
+        排他的注文モード。Trueの場合、新しい注文が前のポジションを自動的にクローズします。
+    index : pd.Index
+        時系列データのインデックス。エクイティカーブの記録に使用されます。
     """
     # Tips:
     # 関数定義における`*`の意味
