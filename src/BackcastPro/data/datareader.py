@@ -10,6 +10,7 @@ from dotenv import load_dotenv
 # Load environment variables from .env file in project root
 load_dotenv()
 
+BACKCASTPRO_API_URL= 'http://backcastpro.i234.me'
 
 def DataReader(code: str, 
         start_date: Union[str, datetime, None] = None, 
@@ -51,7 +52,7 @@ def DataReader(code: str,
     # Construct API URL
     base_url = os.getenv('BACKCASTPRO_API_URL')
     if not base_url:
-        base_url = 'http://backcastpro.i234.me'
+        base_url = BACKCASTPRO_API_URL
         
     # Ensure base_url doesn't end with slash and path starts with slash
     base_url = base_url.rstrip('/')
@@ -103,6 +104,61 @@ def DataReader(code: str,
         for col in numeric_columns:
             if col in df.columns:
                 df[col] = pd.to_numeric(df[col], errors='coerce')
+        
+        return df
+        
+    except requests.exceptions.RequestException as e:
+        raise requests.RequestException(f"Failed to fetch data from API: {e}")
+    except Exception as e:
+        raise ValueError(f"Error processing API response: {e}")
+
+def JapanStocks() -> pd.DataFrame:
+    """
+    日本株の銘柄リストを取得
+    
+    Returns:
+        pd.DataFrame: 日本株の銘柄リスト（コード、名前、市場、セクター等）
+        
+    Raises:
+        requests.RequestException: If API request fails
+        ValueError: If API returns error
+    """
+    # Construct API URL
+    base_url = os.getenv('BACKCASTPRO_API_URL')
+    if not base_url:
+        base_url = BACKCASTPRO_API_URL
+        
+    # Ensure base_url doesn't end with slash and path starts with slash
+    base_url = base_url.rstrip('/')
+    url = f"{base_url}/api/stocks"
+    
+    try:
+        # Make API request
+        response = requests.get(url, timeout=30)
+        response.raise_for_status()
+        
+        # Parse JSON response
+        data = response.json()
+        
+        # Convert to DataFrame
+        if isinstance(data, dict) and 'data' in data:
+            df = pd.DataFrame(data['data'])
+        elif isinstance(data, list):
+            df = pd.DataFrame(data)
+        else:
+            raise ValueError(f"Unexpected response format: {type(data)}")
+        
+        # Ensure proper column names and types
+        if 'code' in df.columns:
+            df['code'] = df['code'].astype(str)
+        if 'name' in df.columns:
+            df['name'] = df['name'].astype(str)
+        if 'market' in df.columns:
+            df['market'] = df['market'].astype(str)
+        if 'sector' in df.columns:
+            df['sector'] = df['sector'].astype(str)
+        if 'currency' in df.columns:
+            df['currency'] = df['currency'].astype(str)
         
         return df
         
