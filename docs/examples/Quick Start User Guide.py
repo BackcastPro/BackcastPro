@@ -1,9 +1,10 @@
+import os
 import sys
 sys.path.append('../../src')
 
 from BackcastPro import Strategy
 from SmaCross import crossover, calculate_rsi, calculate_atr, position_size_by_risk
-
+from Streamlit import plot
 
 class SmaCross(Strategy):
     # Define the two MA lags as *class variables*
@@ -49,3 +50,7 @@ from BackcastPro import Backtest
 bt = Backtest(TOYOTA, SmaCross, cash=10_000, commission=.002)
 stats = bt.run()
 print(stats)
+
+# Streamlit で表示
+filename_without_ext = os.path.splitext(os.path.basename(__file__))[0]
+plot(filename_without_ext, bt)

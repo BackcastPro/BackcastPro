@@ -105,6 +105,9 @@ def DataReader(code: str,
             if col in df.columns:
                 df[col] = pd.to_numeric(df[col], errors='coerce')
         
+        # Add code column to the DataFrame
+        df['code'] = code
+        
         return df
         
     except requests.exceptions.RequestException as e:
