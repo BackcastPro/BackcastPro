@@ -1,6 +1,6 @@
 [project]
 name = "BackcastPro"
-version = "0.0.2"
+version = "0.0.3"
 authors = [
   { name="botterYosuke", email="yosuke.sasazawa@gmail.com" },
 ]

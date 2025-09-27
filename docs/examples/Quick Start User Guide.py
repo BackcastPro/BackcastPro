@@ -2,6 +2,7 @@ import pandas as pd
 from datetime import datetime, timedelta
 
 from BackcastPro import Strategy
+from lib import cross_over, cross_under, position_size_by_risk, update_trailing_stops_and_partials
 
 
 class SmaCross(Strategy):
@@ -56,79 +57,9 @@ class SmaCross(Strategy):
         ], axis=1).max(axis=1)
         self._atr = tr.rolling(self.atr_window, min_periods=self.atr_window).mean()
 
-    def _cross_over(self) -> bool:
-        # 短期が長期を上抜け
-        if len(self.data) < max(self.sma_slow_window, self.atr_window, self.rsi_window) + 2:
-            return False
-        # 現在のバーでのSMAを計算
-        current_data = self.data['Close']
-        sma_fast_current = current_data.rolling(self.sma_fast_window, min_periods=self.sma_fast_window).mean()
-        sma_slow_current = current_data.rolling(self.sma_slow_window, min_periods=self.sma_slow_window).mean()
-        
-        if len(current_data) < 2 or pd.isna(sma_fast_current.iloc[-2]) or pd.isna(sma_slow_current.iloc[-2]) or pd.isna(sma_fast_current.iloc[-1]) or pd.isna(sma_slow_current.iloc[-1]):
-            return False
-            
-        return (sma_fast_current.iloc[-2] <= sma_slow_current.iloc[-2]) and (sma_fast_current.iloc[-1] > sma_slow_current.iloc[-1])
 
-    def _cross_under(self) -> bool:
-        # 短期が長期を下抜け
-        if len(self.data) < max(self.sma_slow_window, self.atr_window, self.rsi_window) + 2:
-            return False
-        # 現在のバーでのSMAを計算
-        current_data = self.data['Close']
-        sma_fast_current = current_data.rolling(self.sma_fast_window, min_periods=self.sma_fast_window).mean()
-        sma_slow_current = current_data.rolling(self.sma_slow_window, min_periods=self.sma_slow_window).mean()
-        
-        if len(current_data) < 2 or pd.isna(sma_fast_current.iloc[-2]) or pd.isna(sma_slow_current.iloc[-2]) or pd.isna(sma_fast_current.iloc[-1]) or pd.isna(sma_slow_current.iloc[-1]):
-            return False
-            
-        return (sma_fast_current.iloc[-2] >= sma_slow_current.iloc[-2]) and (sma_fast_current.iloc[-1] < sma_slow_current.iloc[-1])
 
-    def _position_size_by_risk(self, stop_distance: float) -> int:
-        # 口座資産×risk_per_trade を最大損失とする単位数
-        if stop_distance <= 0 or pd.isna(stop_distance):
-            return 0
-        risk_amount = self.equity * self.risk_per_trade
-        units = int(risk_amount // stop_distance)
-        return max(units, 0)
 
-    def _update_trailing_stops_and_partials(self):
-        # トレーリングSLと部分利確（閾値クロス時に一度のみ発火）
-        if not self.position:
-            return
-
-        close = self.data['Close'].iloc[-1]
-        prev_close = self.data['Close'].iloc[-2]
-        atr = self._atr.iloc[-1]
-        if pd.isna(atr):
-            return
-
-        for t in list(self.trades):
-            if t.is_long:
-                # トレーリングSL（価格 - k * ATR）を引き上げ
-                new_sl = max((t.sl or -float('inf')), close - self.trailing_atr_mult * atr)
-                # エントリーより下にしない（ブレイクイーブン以上）
-                new_sl = max(new_sl, t.entry_price)
-                if t.sl is None or new_sl > t.sl:
-                    t.sl = new_sl
-
-                # 部分利確: TP距離のpartial_tp_rr倍に初到達したとき
-                tp_price = t.entry_price + self.atr_tp_mult * atr
-                threshold = t.entry_price + self.partial_tp_rr * (tp_price - t.entry_price)
-                if prev_close < threshold <= close:
-                    t.close(0.5)
-            else:
-                # ショートのトレーリングSL（価格 + k * ATR）を引き下げ
-                new_sl = min((t.sl or float('inf')), close + self.trailing_atr_mult * atr)
-                new_sl = min(new_sl, t.entry_price)
-                if t.sl is None or new_sl < t.sl:
-                    t.sl = new_sl
-
-                # 部分利確（ショート）
-                tp_price = t.entry_price - self.atr_tp_mult * atr
-                threshold = t.entry_price + self.partial_tp_rr * (tp_price - t.entry_price)
-                if prev_close > threshold >= close:
-                    t.close(0.5)
 
     def next(self):
         # 毎バーの実行ロジック
@@ -145,29 +76,29 @@ class SmaCross(Strategy):
             sma_fast_val = sma_fast_current.iloc[-1] if not pd.isna(sma_fast_current.iloc[-1]) else 'N/A'
             sma_slow_val = sma_slow_current.iloc[-1] if not pd.isna(sma_slow_current.iloc[-1]) else 'N/A'
             print(f"  SMA Fast={sma_fast_val}, SMA Slow={sma_slow_val}")
-            print(f"  Cross Over: {self._cross_over()}, Cross Under: {self._cross_under()}")
+            print(f"  Cross Over: {cross_over(self.data, self.sma_fast_window, self.sma_slow_window, self.atr_window, self.rsi_window)}, Cross Under: {cross_under(self.data, self.sma_fast_window, self.sma_slow_window, self.atr_window, self.rsi_window)}")
         
         if pd.isna(atr) or pd.isna(rsi):
             return
 
         # まず既存ポジションの保守（トレーリング、部分利確）
-        self._update_trailing_stops_and_partials()
+        update_trailing_stops_and_partials(self, self.data, self.trades, self.position, self._atr, self.trailing_atr_mult, self.atr_tp_mult, self.partial_tp_rr)
 
         # 新規エントリは未保有のときのみ
         if not self.position:
             stop_distance = self.atr_sl_mult * atr
-            units = self._position_size_by_risk(stop_distance)
+            units = position_size_by_risk(self.equity, self.risk_per_trade, stop_distance)
             if units <= 0:
                 if len(self.data) <= 20:
                     print(f"  Units calculation failed: stop_distance={stop_distance:.1f}, equity={self.equity:.1f}")
                 return
 
-            if self._cross_over() and rsi >= self.rsi_long_threshold:
+            if cross_over(self.data, self.sma_fast_window, self.sma_slow_window, self.atr_window, self.rsi_window) and rsi >= self.rsi_long_threshold:
                 sl = close - stop_distance
                 tp = close + self.atr_tp_mult * atr
                 print(f"LONG SIGNAL: Close={close:.1f}, Units={units}, SL={sl:.1f}, TP={tp:.1f}")
                 self.buy(size=units, sl=sl, tp=tp, tag='long')
-            elif self._cross_under() and rsi <= self.rsi_short_threshold:
+            elif cross_under(self.data, self.sma_fast_window, self.sma_slow_window, self.atr_window, self.rsi_window) and rsi <= self.rsi_short_threshold:
                 sl = close + stop_distance
                 tp = close - self.atr_tp_mult * atr
                 print(f"SHORT SIGNAL: Close={close:.1f}, Units={units}, SL={sl:.1f}, TP={tp:.1f}")
