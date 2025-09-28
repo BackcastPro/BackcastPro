@@ -105,10 +105,11 @@ class Backtest:
                             'or a function that takes `(order_size, price)`'
                             'and returns commission dollar value')
 
-        first_key, first_value = data.items()[0]
-        for key, value in data.items():
-            if not len(first_value) == len(value):
-                raise TypeError(f"`data[{key}]` 数が、{first_key}と合致していません。")
+        k0, v0 = data.items()[0]
+        len0 = len(v0)
+        for k, v in data.items()[1:]:
+            if not len0 == len(v):
+                raise TypeError(f"`data[{k}]` 数が、{k0}と合致していません。")
 
 
         data = data.copy(deep=False)
