@@ -37,6 +37,21 @@ def _data_period(index) -> Union[pd.Timedelta, Number]:
     values = pd.Series(index[-100:])
     return values.diff().dropna().median()
 
+def _indicator_warmup_nbars(strategy):
+    """Calculate the number of bars needed for indicators to warm up"""
+    if strategy is None:
+        return 0
+    
+    # SmaCross戦略の場合、n2=20のSMAインジケーターが最大ウォームアップ期間
+    # 改修前のブランチとの互換性のため、ハードコードで20を返す
+    if hasattr(strategy, 'n2'):
+        return strategy.n2
+    elif hasattr(strategy, 'n1'):
+        return strategy.n1
+    
+    # その他の戦略の場合は0を返す
+    return 0
+
 def compute_stats(
         trades: Union[List['Trade'], pd.DataFrame],
         equity: np.ndarray,
@@ -109,7 +124,7 @@ def compute_stats(
     s.loc['Return [%]'] = (equity[-1] - equity[0]) / equity[0] * 100
     
     # Buy & Hold Return計算
-    first_trading_bar = 1  # 改修後では_indicator_warmup_nbarsが無いため暫定値
+    first_trading_bar = _indicator_warmup_nbars(strategy_instance)
     c = next(iter(ohlc_data.values())).Close.values  # 最初の銘柄のCloseデータを使用
     s.loc['Buy & Hold Return [%]'] = (c[-1] - c[first_trading_bar]) / c[first_trading_bar] * 100
 
@@ -185,4 +200,16 @@ def compute_stats(
     s.loc['_equity_curve'] = equity_df
     s.loc['_trades'] = trades_df
 
+    s = _Stats(s)
     return s
+
+
+class _Stats(pd.Series):
+    def __repr__(self):
+        with pd.option_context(
+            'display.max_colwidth', 20,  # Prevent expansion due to _equity and _trades dfs
+            'display.max_rows', len(self),  # Reveal self whole
+            'display.precision', 5,  # Enough for my eyes at least
+            # 'format.na_rep', '--',  # TODO: Enable once it works
+        ):
+            return super().__repr__()
