@@ -1,6 +1,6 @@
 var classsrc_1_1BackcastPro_1_1trade_1_1Trade =
 [
-    [ "__init__", "classsrc_1_1BackcastPro_1_1trade_1_1Trade.html#a1146a6bb8b7648cd3ab26481396e4f16", null ],
+    [ "__init__", "classsrc_1_1BackcastPro_1_1trade_1_1Trade.html#a415ca0a5f76725f5fd7fb0af612aec47", null ],
     [ "_copy", "classsrc_1_1BackcastPro_1_1trade_1_1Trade.html#a72bcb72e0067f3916e2930ca89ae7caa", null ],
     [ "_replace", "classsrc_1_1BackcastPro_1_1trade_1_1Trade.html#a4dc6d033170064fca56e2855191f802a", null ],
     [ "_sl_order", "classsrc_1_1BackcastPro_1_1trade_1_1Trade.html#af31322fd766af5aaf9aa58521f53037d", null ],
