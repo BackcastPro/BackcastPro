@@ -48,8 +48,8 @@ stats = bt.run()
 print(stats)
 
 # Streamlit で表示
-page_title = os.path.splitext(os.path.basename(__file__))[0]
-plot(page_title, bt)
+# page_title = os.path.splitext(os.path.basename(__file__))[0]
+# plot(page_title, bt)
 
 
 
