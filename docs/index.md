@@ -7,7 +7,7 @@ BackcastProは、トレーディング戦略のためのPythonバックテスト
 ### ユーザー向けドキュメント
 
 - **[チュートリアル](tutorial.md)** - 基本的な使い方を学ぶ
-- **[APIリファレンス](api-reference.md)** - クラスとメソッドの詳細
+- **[APIリファレンス](https://botteryosuke.github.io/BackcastPro/namespacesrc_1_1BackcastPro.html)** - クラスとメソッドの詳細
 - **[トラブルシューティング](troubleshooting.md)** - よくある問題と解決方法
 
 ### 開発者向けドキュメント

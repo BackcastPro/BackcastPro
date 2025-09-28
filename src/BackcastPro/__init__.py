@@ -3,11 +3,10 @@ BackcastPro をご利用いただきありがとうございます。
 
 インストール後のご案内（インストール済みユーザー向け）
 
-- ドキュメント総合トップ: https://botteryosuke.github.io/BackcastPro/
-- クイックスタート/チュートリアル: https://botteryosuke.github.io/BackcastPro/tutorial
-- APIリファレンス: https://botteryosuke.github.io/BackcastPro/api-reference
-- 高度な使い方: https://botteryosuke.github.io/BackcastPro/advanced-usage
-- トラブルシューティング: https://botteryosuke.github.io/BackcastPro/troubleshooting
+- ドキュメント総合トップ: [index.md](https://github.com/botterYosuke/BackcastPro/blob/main/docs/index.md)
+- クイックスタート/チュートリアル: [tutorial.md](https://github.com/botterYosuke/BackcastPro/blob/main/docs/tutorial.md)
+- APIリファレンス: [BackcastPro - APIリファレンス](https://botteryosuke.github.io/BackcastPro/namespacesrc_1_1BackcastPro.html)
+- トラブルシューティング: [troubleshooting.md](https://github.com/botterYosuke/BackcastPro/blob/main/docs/troubleshooting.md)
 
 ※ 使い始めはチュートリアル → 詳細はAPIリファレンスをご参照ください。
 """
