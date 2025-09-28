@@ -40,13 +40,13 @@ def _data_period(index) -> Union[pd.Timedelta, Number]:
 def compute_stats(
         trades: Union[List['Trade'], pd.DataFrame],
         equity: np.ndarray,
-        ohlc_data: dict[str, pd.DataFrame],
+        ohlc_data: pd.DataFrame,
         strategy_instance: Strategy | None,
         risk_free_rate: float = 0,
 ) -> pd.Series:
     assert -1 < risk_free_rate < 1
 
-    index = next(iter(ohlc_data.values())).index
+    index = ohlc_data.index
     dd = 1 - equity / np.maximum.accumulate(equity)
     dd_dur, dd_peaks = compute_drawdown_duration_peaks(pd.Series(dd, index=index))
 
