@@ -24,7 +24,7 @@
 */
 var NAVTREE =
 [
-  [ "BackcastPro", "index.html", [
+  [ "BackcastPro - APIリファレンス", "index.html", [
     [ "名前空間", "namespaces.html", [
       [ "名前空間一覧", "namespaces.html", "namespaces_dup" ],
       [ "名前空間メンバ", "namespacemembers.html", [
