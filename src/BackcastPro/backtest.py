@@ -12,7 +12,7 @@ import pandas as pd
 from tqdm import tqdm # プログレスバー
 
 from ._broker import _Broker
-from ._stats import compute_stats, _indicator_warmup_nbars
+from ._stats import compute_stats
 
 
 class Backtest:
@@ -238,7 +238,7 @@ class Backtest:
         
         # インジケーターがまだ「ウォームアップ」中の最初の数本のキャンドルをスキップ
         # 少なくとも2つのエントリが利用可能になるように+1
-        start = 1 + _indicator_warmup_nbars(strategy)
+        start = 1
 
         # "invalid value encountered in ..."警告を無効化。比較
         # np.nan >= 3は無効ではない；Falseです。

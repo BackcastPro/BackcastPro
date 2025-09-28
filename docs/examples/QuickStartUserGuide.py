@@ -31,6 +31,11 @@ class SmaCross(Strategy):
             
     
     def next(self):
+
+        if self.progress < self.n2:
+            """Calculate the number of bars needed for indicators to warm up"""
+            return
+
         for code, df in self.data.items():
             # If sma1 crosses above sma2, close any existing
             # short trades, and buy the asset

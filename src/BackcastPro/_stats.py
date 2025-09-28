@@ -37,21 +37,6 @@ def _data_period(index) -> Union[pd.Timedelta, Number]:
     values = pd.Series(index[-100:])
     return values.diff().dropna().median()
 
-def _indicator_warmup_nbars(strategy):
-    """Calculate the number of bars needed for indicators to warm up"""
-    if strategy is None:
-        return 0
-    
-    # SmaCross戦略の場合、n2=20のSMAインジケーターが最大ウォームアップ期間
-    # 改修前のブランチとの互換性のため、ハードコードで20を返す
-    if hasattr(strategy, 'n2'):
-        return strategy.n2
-    elif hasattr(strategy, 'n1'):
-        return strategy.n1
-    
-    # その他の戦略の場合は0を返す
-    return 0
-
 def compute_stats(
         trades: Union[List['Trade'], pd.DataFrame],
         equity: np.ndarray,
@@ -123,11 +108,6 @@ def compute_stats(
         s.loc['Commissions [$]'] = commissions
     s.loc['Return [%]'] = (equity[-1] - equity[0]) / equity[0] * 100
     
-    # Buy & Hold Return計算
-    first_trading_bar = _indicator_warmup_nbars(strategy_instance)
-    c = next(iter(ohlc_data.values())).Close.values  # 最初の銘柄のCloseデータを使用
-    s.loc['Buy & Hold Return [%]'] = (c[-1] - c[first_trading_bar]) / c[first_trading_bar] * 100
-
     gmean_day_return: float = 0
     day_returns = np.array(np.nan)
     annual_trading_days = np.nan
@@ -165,19 +145,7 @@ def compute_stats(
         s.loc['Sortino Ratio'] = (annualized_return - risk_free_rate) / (np.sqrt(np.mean(day_returns.clip(-np.inf, 0)**2)) * np.sqrt(annual_trading_days))  # noqa: E501
     max_dd = -np.nan_to_num(dd.max())
     s.loc['Calmar Ratio'] = annualized_return / (-max_dd or np.nan)
-    
-    # Alpha と Beta の計算
-    equity_log_returns = np.log(equity[1:] / equity[:-1])
-    market_log_returns = np.log(c[1:] / c[:-1])
-    beta = np.nan
-    if len(equity_log_returns) > 1 and len(market_log_returns) > 1:
-        # len == 0 on dummy call `stats_keys = compute_stats(...)` pre optimization
-        cov_matrix = np.cov(equity_log_returns, market_log_returns)
-        beta = cov_matrix[0, 1] / cov_matrix[1, 1]
-    # Jensen CAPM Alpha: can be strongly positive when beta is negative and B&H Return is large
-    s.loc['Alpha [%]'] = s.loc['Return [%]'] - risk_free_rate * 100 - beta * (s.loc['Buy & Hold Return [%]'] - risk_free_rate * 100)
-    s.loc['Beta'] = beta
-    
+       
     s.loc['Max. Drawdown [%]'] = max_dd * 100
     s.loc['Avg. Drawdown [%]'] = -dd_peaks.mean() * 100
     s.loc['Max. Drawdown Duration'] = _round_timedelta(dd_dur.max())
