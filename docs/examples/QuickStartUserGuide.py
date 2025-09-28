@@ -15,34 +15,35 @@ class SmaCross(Strategy):
     n2 = 20
     
     def init(self):
-        # Precompute the two moving averages and add to data
-        self.data['SMA1'] = self.data.Close.rolling(self.n1).mean()
-        self.data['SMA2'] = self.data.Close.rolling(self.n2).mean()
-        
-        # Calculate RSI and ATR for risk management and add to data
-        self.data['RSI'] = calculate_rsi(self.data)
-        self.data['ATR'] = calculate_atr(self.data)
+        for code, df in self.data:
+            # Precompute the two moving averages and add to data
+            df['SMA1'] = df.Close.rolling(self.n1).mean()
+            df['SMA2'] = df.Close.rolling(self.n2).mean()
+            
+            # Calculate RSI and ATR for risk management and add to data
+            df['RSI'] = calculate_rsi(df)
+            df['ATR'] = calculate_atr(df)
     
     def next(self):
-        # If sma1 crosses above sma2, close any existing
-        # short trades, and buy the asset
-        if crossover(self.data.SMA1, self.data.SMA2):
-            self.position.close()
-            self.buy()
+        for code, df in self.data:
+            # If sma1 crosses above sma2, close any existing
+            # short trades, and buy the asset
+            if crossover(df.SMA1, df.SMA2):
+                self.buy(code=code)
 
-        # Else, if sma1 crosses below sma2, close any existing
-        # long trades, and sell the asset
-        elif crossover(self.data.SMA2, self.data.SMA1):
-            self.position.close()
-            self.sell()
+            # Else, if sma1 crosses below sma2, close any existing
+            # long trades, and sell the asset
+            elif crossover(df.SMA2, df.SMA1):
+                self.sell(code=code)
 
 
 # データ取得とバックテスト実行
 from BackcastPro import Backtest
 
 # データ取得（例: トヨタ 7203）
-df = web.DataReader('7203.JP', 'stooq')
-bt = Backtest(df, SmaCross, cash=10_000, commission=.002, finalize_trades=True)
+code='7203.JP'
+df = web.DataReader(code, 'stooq')
+bt = Backtest({code: df}, SmaCross, cash=10_000, commission=.002, finalize_trades=True)
 stats = bt.run()
 print(stats)
 

@@ -6,6 +6,7 @@ from __future__ import annotations
 
 import sys
 from abc import ABCMeta, abstractmethod
+from tkinter import NO
 from typing import Optional, Tuple
 
 import pandas as pd
@@ -88,6 +89,7 @@ class Strategy(metaclass=ABCMeta):
     _FULL_EQUITY = __FULL_EQUITY(1 - sys.float_info.epsilon)
 
     def buy(self, *,
+            code: str,
             size: float = _FULL_EQUITY,
             limit: Optional[float] = None,
             stop: Optional[float] = None,
@@ -108,9 +110,11 @@ class Strategy(metaclass=ABCMeta):
         """
         assert 0 < size < 1 or round(size) == size >= 1, \
             "sizeは正の資産割合または正の整数単位である必要があります"
-        return self._broker.new_order(size, limit, stop, sl, tp, tag)
+
+        return self._broker.new_order(code, size, limit, stop, sl, tp, tag)
 
     def sell(self, *,
+             code: str,
              size: float = _FULL_EQUITY,
              limit: Optional[float] = None,
              stop: Optional[float] = None,
@@ -139,7 +143,8 @@ class Strategy(metaclass=ABCMeta):
         """
         assert 0 < size < 1 or round(size) == size >= 1, \
             "sizeは正の資産割合または正の整数単位である必要があります"
-        return self._broker.new_order(-size, limit, stop, sl, tp, tag)
+
+        return self._broker.new_order(code, -size, limit, stop, sl, tp, tag)
 
     @property
     def equity(self) -> float:

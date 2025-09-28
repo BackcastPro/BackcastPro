@@ -20,3 +20,9 @@ BackcastProの主要クラスとメソッドの詳細なリファレンスです
 ## [Trade](https://botteryosuke.github.io/BackcastPro/classsrc_1_1BackcastPro_1_1trade_1_1Trade.html)
 
 個別のトレードを表すクラス。
+
+## [_Broker](https://botteryosuke.github.io/BackcastPro/classsrc_1_1BackcastPro_1_1__broker_1_1__Broker.html)
+
+バックテストにおける証券取引の実行、注文管理、ポジション管理、損益計算を担当します。
+実際の証券会社のブローカー機能をシミュレートし、リアルな取引環境を提供します。
+
