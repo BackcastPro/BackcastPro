@@ -76,9 +76,9 @@ class Backtest:
     まだ[アクティブで継続中]の取引は最後のバーでクローズされ、
     計算されたバックテスト統計に貢献します。
     """  
-    
+
     def __init__(self,
-                 data: pd.DataFrame,
+                 data: dict[str, pd.DataFrame],
                  strategy: Type,
                  *,
                  cash: float = 10_000,
@@ -95,8 +95,7 @@ class Backtest:
         
         if not (isinstance(strategy, type) and issubclass(strategy, Strategy)):
             raise TypeError('`strategy` must be a Strategy sub-type')
-        if not isinstance(data, pd.DataFrame):
-            raise TypeError("`data` must be a pandas.DataFrame with columns")
+    
         if not isinstance(spread, Number):
             raise TypeError('`spread` must be a float value, percent of '
                             'entry order price')
@@ -106,47 +105,59 @@ class Backtest:
                             'or a function that takes `(order_size, price)`'
                             'and returns commission dollar value')
 
-        data = data.copy(deep=False)
+        k0, v0 = next(iter(data.items()))
+        len0 = len(v0)
+        for k, v in list(data.items())[1:]:
+            if not len0 == len(v):
+                raise TypeError(f"`data[{k}]` 数が、{k0}と合致していません。")
 
-        # インデックスをdatetimeインデックスに変換
-        if (not isinstance(data.index, pd.DatetimeIndex) and
-            not isinstance(data.index, pd.RangeIndex) and
-            # 大部分が大きな数値の数値インデックス
-            (data.index.is_numeric() and
-             (data.index > pd.Timestamp('1975').timestamp()).mean() > .8)):
-            try:
-                data.index = pd.to_datetime(data.index, infer_datetime_format=True)
-            except ValueError:
-                pass
 
-        if 'Volume' not in data:
-            data['Volume'] = np.nan
+        data = data.copy()
 
-        if len(data) == 0:
-            raise ValueError('OHLC `data` is empty')
-        if len(data.columns.intersection({'Open', 'High', 'Low', 'Close', 'Volume'})) != 5:
-            raise ValueError("`data` must be a pandas.DataFrame with columns "
-                             "'Open', 'High', 'Low', 'Close', and (optionally) 'Volume'")
-        if data[['Open', 'High', 'Low', 'Close']].isnull().values.any():
-            raise ValueError('Some OHLC values are missing (NaN). '
-                             'Please strip those lines with `df.dropna()` or '
-                             'fill them in with `df.interpolate()` or whatever.')
-        if np.any(data['Close'] > cash):
-            warnings.warn('Some prices are larger than initial cash value. Note that fractional '
-                          'trading is not supported by this class. If you want to trade Bitcoin, '
-                          'increase initial cash, or trade μBTC or satoshis instead (see e.g. class '
-                          '`backtesting.lib.FractionalBacktest`.',
-                          stacklevel=2)
-        if not data.index.is_monotonic_increasing:
-            warnings.warn('Data index is not sorted in ascending order. Sorting.',
-                          stacklevel=2)
-            data = data.sort_index()
-        if not isinstance(data.index, pd.DatetimeIndex):
-            warnings.warn('Data index is not datetime. Assuming simple periods, '
-                          'but `pd.DateTimeIndex` is advised.',
-                          stacklevel=2)
+        for code, df in data.items():
+            if not isinstance(df, pd.DataFrame):
+                raise TypeError(f"`data[{code}]` must be a pandas.DataFrame with columns")
 
-        self._data: pd.DataFrame = data
+            # インデックスをdatetimeインデックスに変換
+            if (not isinstance(df.index, pd.DatetimeIndex) and
+                not isinstance(df.index, pd.RangeIndex) and
+                # 大部分が大きな数値の数値インデックス
+                (df.index.is_numeric() and
+                (df.index > pd.Timestamp('1975').timestamp()).mean() > .8)):
+                try:
+                    df.index = pd.to_datetime(df.index, infer_datetime_format=True)
+                except ValueError:
+                    pass
+
+            if 'Volume' not in df:
+                df['Volume'] = np.nan
+
+            if len(df) == 0:
+                raise ValueError(f'OHLC `data[{code}]` is empty')
+            if len(df.columns.intersection({'Open', 'High', 'Low', 'Close', 'Volume'})) != 5:
+                raise ValueError(f"`data[{code}]` must be a pandas.DataFrame with columns "
+                                "'Open', 'High', 'Low', 'Close', and (optionally) 'Volume'")
+            if df[['Open', 'High', 'Low', 'Close']].isnull().values.any():
+                raise ValueError('Some OHLC values are missing (NaN). '
+                                'Please strip those lines with `df.dropna()` or '
+                                'fill them in with `df.interpolate()` or whatever.')
+            if np.any(df['Close'] > cash):
+                warnings.warn('Some prices are larger than initial cash value. Note that fractional '
+                            'trading is not supported by this class. If you want to trade Bitcoin, '
+                            'increase initial cash, or trade μBTC or satoshis instead (see e.g. class '
+                            '`backtesting.lib.FractionalBacktest`.',
+                            stacklevel=2)
+            if not df.index.is_monotonic_increasing:
+                warnings.warn(f'data[{code}] index is not sorted in ascending order. Sorting.',
+                            stacklevel=2)
+                df = df.sort_index()
+                data[code] = df  # 重要：ソート後のDataFrameを辞書に再代入
+            if not isinstance(df.index, pd.DatetimeIndex):
+                warnings.warn(f'data[{code}] index is not datetime. Assuming simple periods, '
+                            'but `pd.DateTimeIndex` is advised.',
+                            stacklevel=2)
+
+        self._data: dict[str, pd.DataFrame] = data
 
         # partialとは、関数の一部の引数を事前に固定して、新しい関数を作成します。
         # これにより、後で残りの引数だけを渡せば関数を実行できるようになります。
@@ -156,7 +167,7 @@ class Backtest:
         self._broker = partial(
             _Broker, cash=cash, spread=spread, commission=commission, margin=margin,
             trade_on_close=trade_on_close, hedging=hedging,
-            exclusive_orders=exclusive_orders, index=data.index,
+            exclusive_orders=exclusive_orders, index=next(iter(data.values())).index,
         )
 
         self._strategy = strategy
@@ -217,14 +228,13 @@ class Backtest:
         # 循環インポートを避けるためにここでインポート
         from .strategy import Strategy
         
-        data = self._data.copy(deep=False)
-        broker: _Broker = self._broker(data=data)
-        strategy: Strategy = self._strategy(broker, data)
+        broker: _Broker = self._broker(data=self._data)
+        strategy: Strategy = self._strategy(broker, self._data)
 
         strategy.init()
 
-        # strategy.init()で加工されたdataを再登録
-        self._data = data
+        # strategy.init()で加工されたdataを登録
+        data = self._data.copy()
         
         # インジケーターがまだ「ウォームアップ」中の最初の数本のキャンドルをスキップ
         # 少なくとも2つのエントリが利用可能になるように+1
@@ -235,7 +245,8 @@ class Backtest:
         with np.errstate(invalid='ignore'):
 
             # プログレスバーを表示
-            progress_bar = tqdm(range(start, len(self._data)), 
+            length = len(next(iter(self._data.values())))
+            progress_bar = tqdm(range(start, length), 
                               desc="バックテスト実行中", 
                               unit="step",
                               ncols=120,
@@ -243,8 +254,11 @@ class Backtest:
                               dynamic_ncols=True)
             
             for i in progress_bar:
+
                 # 注文処理とブローカー関連の処理
-                data = self._data.iloc[:i]
+                data = {k: v.iloc[:i] for k, v in self._data.items()}
+
+                # brokerに更新したdateを再登録
                 try:
                     broker._data = data
                     broker.next()
@@ -256,9 +270,10 @@ class Backtest:
                 strategy.next()
                 
                 # プログレスバーの説明を更新（現在の日付を表示）
-                if hasattr(self._data.index, 'strftime') and i > 0:
+                index = next(iter(data.values())).index
+                if hasattr(index, 'strftime') and i > 0:
                     try:
-                        current_date = self._data.index[i-1].strftime('%Y-%m-%d')
+                        current_date = index[i-1].strftime('%Y-%m-%d')
                         progress_bar.set_postfix({"日付": current_date})
                     except:
                         pass
@@ -270,7 +285,7 @@ class Backtest:
 
                     # HACK: 最後の戦略イテレーションで配置されたクローズ注文を処理するために
                     #  ブローカーを最後にもう一度実行。最後のブローカーイテレーションと同じOHLC値を使用。
-                    if start < len(self._data):
+                    if start < length:
                         broker.next()
                 elif len(broker.trades):
                     warnings.warn(

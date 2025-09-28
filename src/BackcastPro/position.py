@@ -58,5 +58,3 @@ class Position:
         for trade in self.__broker.trades:
             trade.close(portion)
 
-    def __repr__(self):
-        return f'<Position: {self.size} ({len(self.__broker.trades)} trades)>'

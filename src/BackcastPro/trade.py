@@ -18,8 +18,9 @@ class Trade:
     `Order`が約定されると、アクティブな`Trade`が発生します。
     アクティブな取引は`Strategy.trades`で、クローズされた決済済み取引は`Strategy.closed_trades`で見つけることができます。
     """
-    def __init__(self, broker: '_Broker', size: int, entry_price: float, entry_bar, tag):
+    def __init__(self, broker: '_Broker', code: str, size: int, entry_price: float, entry_bar, tag):
         self.__broker = broker
+        self.__code = code
         self.__size = size
         self.__entry_price = entry_price
         self.__exit_price: Optional[float] = None
@@ -29,11 +30,6 @@ class Trade:
         self.__tp_order: Optional[Order] = None
         self.__tag = tag
         self._commissions = 0
-
-    def __repr__(self):
-        return f'<Trade size={self.__size} time={self.__entry_bar}-{self.__exit_bar or ""} ' \
-               f'price={self.__entry_price}-{self.__exit_price or ""} pl={self.pl:.0f}' \
-               f'{" tag=" + str(self.__tag) if self.__tag is not None else ""}>'
 
     def _replace(self, **kwargs):
         for k, v in kwargs.items():
@@ -49,10 +45,15 @@ class Trade:
         # Ensure size is an int to avoid rounding errors on 32-bit OS
         size = copysign(max(1, int(round(abs(self.__size) * portion))), -self.__size)
         from .order import Order
-        order = Order(self.__broker, size, parent_trade=self, tag=self.__tag)
+        order = Order(self.__broker, self.__code, size, parent_trade=self, tag=self.__tag)
         self.__broker.orders.insert(0, order)
 
     # Fields getters
+
+    @property
+    def code(self):
+        """取引対象銘柄"""
+        return self.__code
 
     @property
     def size(self):
@@ -106,14 +107,15 @@ class Trade:
     @property
     def entry_time(self) -> Union[pd.Timestamp, int]:
         """取引がエントリーされた日時。"""
-        return self.__broker._data.index[self.__entry_bar]
+        return self.__broker._data[self.__code].index[self.__entry_bar]
 
     @property
     def exit_time(self) -> Optional[Union[pd.Timestamp, int]]:
         """取引がエグジットされた日時。"""
         if self.__exit_bar is None:
             return None
-        return self.__broker._data.index[self.__exit_bar]
+            
+        return self.__broker._data[self.__code].index[self.__exit_bar]
 
     @property
     def is_long(self):
@@ -131,13 +133,13 @@ class Trade:
         取引の利益（正の値）または損失（負の値）を現金単位で表示。
         手数料は取引がクローズされた後にのみ反映されます。
         """
-        price = self.__exit_price or self.__broker.last_price
+        price = self.__exit_price or self.__broker.last_price(self.__code)
         return (self.__size * (price - self.__entry_price)) - self._commissions
 
     @property
     def pl_pct(self):
         """取引の利益（正の値）または損失（負の値）をパーセントで表示。"""
-        price = self.__exit_price or self.__broker.last_price
+        price = self.__exit_price or self.__broker.last_price(self.__code)
         gross_pl_pct = copysign(1, self.__size) * (price / self.__entry_price - 1)
 
         # 取引全体のサイズに対する手数料を個別単位に換算
@@ -147,7 +149,7 @@ class Trade:
     @property
     def value(self):
         """取引の総価値を現金単位で表示（ボリューム × 価格）。"""
-        price = self.__exit_price or self.__broker.last_price
+        price = self.__exit_price or self.__broker.last_price(self.__code)
         return abs(self.__size) * price
 
     # SL/TP management API
@@ -191,5 +193,5 @@ class Trade:
             order.cancel()
         if price:
             kwargs = {'stop': price} if type == 'sl' else {'limit': price}
-            order = self.__broker.new_order(-self.size, trade=self, tag=self.tag, **kwargs)
+            order = self.__broker.new_order(self.code, -self.size, trade=self, tag=self.tag, **kwargs)
             setattr(self, attr, order)

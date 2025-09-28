@@ -46,6 +46,7 @@ class _Broker:
     index : pd.Index
         時系列データのインデックス。エクイティカーブの記録に使用されます。
     """
+
     # Tips:
     # 関数定義における`*`の意味
     # - `*`以降の引数は、必ずキーワード引数として渡す必要がある
@@ -58,7 +59,7 @@ class _Broker:
                  trade_on_close, hedging, exclusive_orders, index):
         assert cash > 0, f"cash should be > 0, is {cash}"
         assert 0 < margin <= 1, f"margin should be between 0 and 1, is {margin}"
-        self._data: pd.DataFrame = data
+        self._data: dict[str, pd.DataFrame] = data
         self._cash = cash
 
         # 手数料の登録
@@ -92,10 +93,8 @@ class _Broker:
     def _commission_func(self, order_size, price):
         return self._commission_fixed + abs(order_size) * price * self._commission_relative
 
-    def __repr__(self):
-        return f'<Broker: {self._cash:.0f}{self.position.pl:+.1f} ({len(self.trades)} trades)>'
-
     def new_order(self,
+                  code: str,
                   size: float,
                   limit: Optional[float] = None,
                   stop: Optional[float] = None,
@@ -115,7 +114,7 @@ class _Broker:
 
         is_long = size > 0
         assert size != 0, size
-        adjusted_price = self._adjusted_price(size)
+        adjusted_price = self._adjusted_price(code, size)
 
         if is_long:
             if not (sl or -np.inf) < (limit or stop or adjusted_price) < (tp or np.inf):
@@ -128,7 +127,7 @@ class _Broker:
                     "Short orders require: "
                     f"TP ({tp}) < LIMIT ({limit or stop or adjusted_price}) < SL ({sl})")
 
-        order = Order(self, size, limit, stop, sl, tp, trade, tag)
+        order = Order(self, code, size, limit, stop, sl, tp, trade, tag)
 
         if not trade:
             # 排他的注文（各新しい注文が前の注文/ポジションを自動クローズ）の場合、
@@ -145,17 +144,16 @@ class _Broker:
 
         return order
 
-    @property
-    def last_price(self) -> float:
+    def last_price(self, code: str) -> float:
         """ Price at the last (current) close. """
-        return self._data.Close.iloc[-1]
+        return self._data[code].Close.iloc[-1]
 
-    def _adjusted_price(self, size=None, price=None) -> float:
+    def _adjusted_price(self, code: str, size=None, price=None) -> float:
         """
         Long/short `price`, adjusted for spread.
         In long positions, the adjusted price is a fraction higher, and vice versa.
         """
-        return (price or self.last_price) * (1 + copysign(self._spread, size))
+        return (price or self.last_price(code)) * (1 + copysign(self._spread, size))
 
     @property
     def equity(self) -> float:
@@ -176,7 +174,8 @@ class _Broker:
         return self._commission
 
     def next(self):
-        i = self._i = len(self._data) - 1
+        length = len(next(iter(self._data.values())))
+        i = self._i = length - 1  # データスライスの最後のインデックス（現在のステップ）
         self._process_orders()
 
         # エクイティカーブ用にアカウントエクイティを記録
@@ -187,14 +186,14 @@ class _Broker:
         if equity <= 0:
             assert self.margin_available <= 0
             for trade in self.trades:
-                self._close_trade(trade, self._data.Close.iloc[-1], i)
+                price = self._data[trade.code].Close.iloc[-1]
+                self._close_trade(trade, price, i)
             self._cash = 0
             self._equity[i:] = 0
             raise Exception
 
     def _process_orders(self):
         data = self._data
-        open, high, low = data.Open.iloc[-1], data.High.iloc[-1], data.Low.iloc[-1]
         reprocess_orders = False
 
         # 注文を処理
@@ -203,6 +202,17 @@ class _Broker:
             # 関連するSL/TP注文は既に削除されている
             if order not in self.orders:
                 continue
+
+            # 注文の銘柄データを取得
+            if order.code not in data:
+                continue
+            df = data[order.code]
+            
+            # データの存在確認
+            if len(df) < 2:
+                continue
+                
+            open, high, low = df.Open.iloc[-1], df.High.iloc[-1], df.Low.iloc[-1]
 
             # ストップ条件が満たされたかチェック
             stop_price = order.stop
@@ -223,141 +233,142 @@ class _Broker:
                 # リミットがストップより先に満たされたと仮定する（つまり「カウントされる前に」）
                 is_limit_hit_before_stop = (is_limit_hit and
                                             (order.limit <= (stop_price or -np.inf)
-                                             if order.is_long
-                                             else order.limit >= (stop_price or np.inf)))
+                                            if order.is_long
+                                            else order.limit >= (stop_price or np.inf)))
                 if not is_limit_hit or is_limit_hit_before_stop:
                     continue
 
                 # stop_priceが設定されている場合、このバー内で満たされた
                 price = (min(stop_price or open, order.limit)
-                         if order.is_long else
-                         max(stop_price or open, order.limit))
+                        if order.is_long else
+                        max(stop_price or open, order.limit))
             else:
                 # 成行注文（Market-if-touched / market order）
                 # 条件付き注文は常に次の始値で
-                prev_close = data.Close.iloc[-2]
+                prev_close = df.Close.iloc[-2]
                 price = prev_close if self._trade_on_close and not order.is_contingent else open
                 if stop_price:
                     price = max(price, stop_price) if order.is_long else min(price, stop_price)
 
-            # エントリー/エグジットバーのインデックスを決定
-            is_market_order = not order.limit and not stop_price
-            time_index = (
-                (self._i - 1)
-                if is_market_order and self._trade_on_close and not order.is_contingent else
-                self._i)
+                # エントリー/エグジットバーのインデックスを決定
+                is_market_order = not order.limit and not stop_price
+                time_index = (
+                    (self._i - 1)
+                    if is_market_order and self._trade_on_close and not order.is_contingent else
+                    self._i)
 
-            # 注文がSL/TP注文の場合、それが依存していた既存の取引をクローズする必要がある
-            if order.parent_trade:
-                trade = order.parent_trade
-                _prev_size = trade.size
-                # order.sizeがtrade.sizeより「大きい」場合、この注文はtrade.close()注文で
-                # 取引の一部は事前にクローズされている
-                size = copysign(min(abs(_prev_size), abs(order.size)), order.size)
-                # この取引がまだクローズされていない場合（例：複数の`trade.close(.5)`呼び出し）
-                if trade in self.trades:
-                    self._reduce_trade(trade, price, size, time_index)
-                    assert order.size != -_prev_size or trade not in self.trades
-                    if price == stop_price:
-                        # 統計用にSLを注文に戻す
-                        trade._sl_order._replace(stop_price=stop_price)
-                if order in (trade._sl_order,
-                             trade._tp_order):
-                    assert order.size == -trade.size
-                    assert order not in self.orders  # 取引がクローズされたときに削除される
-                else:
-                    # trade.close()注文で、完了
-                    assert abs(_prev_size) >= abs(size) >= 1
-                    self.orders.remove(order)
-                continue
+                # 注文がSL/TP注文の場合、それが依存していた既存の取引をクローズする必要がある
+                if order.parent_trade:
+                    trade = order.parent_trade
+                    _prev_size = trade.size
+                    # order.sizeがtrade.sizeより「大きい」場合、この注文はtrade.close()注文で
+                    # 取引の一部は事前にクローズされている
+                    size = copysign(min(abs(_prev_size), abs(order.size)), order.size)
+                    # この取引がまだクローズされていない場合（例：複数の`trade.close(.5)`呼び出し）
+                    if trade in self.trades:
+                        self._reduce_trade(trade, price, size, time_index)
+                        assert order.size != -_prev_size or trade not in self.trades
+                        if price == stop_price:
+                            # 統計用にSLを注文に戻す
+                            trade._sl_order._replace(stop_price=stop_price)
+                    if order in (trade._sl_order,
+                                trade._tp_order):
+                        assert order.size == -trade.size
+                        assert order not in self.orders  # 取引がクローズされたときに削除される
+                    else:
+                        # trade.close()注文で、完了
+                        assert abs(_prev_size) >= abs(size) >= 1
+                        self.orders.remove(order)
+                    continue
 
-            # そうでなければ、これは独立した取引
+                # そうでなければ、これは独立した取引
 
-            # 手数料（またはビッドアスクスプレッド）を含むように価格を調整
-            # ロングポジションでは調整価格が少し高くなり、その逆も同様
-            adjusted_price = self._adjusted_price(order.size, price)
-            adjusted_price_plus_commission = \
-                adjusted_price + self._commission(order.size, price) / abs(order.size)
+                # 手数料（またはビッドアスクスプレッド）を含むように価格を調整
+                # ロングポジションでは調整価格が少し高くなり、その逆も同様
+                adjusted_price = self._adjusted_price(code=order.code, size=order.size, price=price)
+                adjusted_price_plus_commission = \
+                    adjusted_price + self._commission(order.size, price) / abs(order.size)
 
-            # 注文サイズが比例的に指定された場合、
-            # マージンとスプレッド/手数料を考慮して、単位での真のサイズを事前計算
-            size = order.size
-            if -1 < size < 1:
-                size = copysign(int((self.margin_available * self._leverage * abs(size))
-                                    // adjusted_price_plus_commission), size)
-                # 単一ユニットでも十分な現金/マージンがない
-                if not size:
-                    warnings.warn(
-                        f'time={self._i}: ブローカーは相対サイズの注文を'
-                        f'不十分なマージンのためキャンセルしました。', category=UserWarning)
-                    # XXX: 注文はブローカーによってキャンセルされる？
+                # 注文サイズが比例的に指定された場合、
+                # マージンとスプレッド/手数料を考慮して、単位での真のサイズを事前計算
+                size = order.size
+                if -1 < size < 1:
+                    size = copysign(int((self.margin_available * self._leverage * abs(size))
+                                        // adjusted_price_plus_commission), size)
+                    # 単一ユニットでも十分な現金/マージンがない
+                    if not size:
+                        warnings.warn(
+                            f'time={self._i}: ブローカーは相対サイズの注文を'
+                            f'不十分なマージンのためキャンセルしました。', category=UserWarning)
+                        # XXX: 注文はブローカーによってキャンセルされる？
+                        self.orders.remove(order)
+                        continue
+                assert size == round(size)
+                need_size = int(size)
+
+                if not self._hedging:
+                    # 既存の反対方向の取引をFIFOでクローズ/削減してポジションを埋める
+                    # 既存の取引は調整価格でクローズされる（調整は購入時に既に行われているため）
+                    for trade in list(self.trades):
+                        if trade.is_long == order.is_long:
+                            continue
+                        assert trade.size * order.size < 0
+
+                        # 注文サイズがこの反対方向の既存取引より大きい場合、
+                        # 完全にクローズされる
+                        if abs(need_size) >= abs(trade.size):
+                            self._close_trade(trade, price, time_index)
+                            need_size += trade.size
+                        else:
+                            # 既存の取引が新しい注文より大きい場合、
+                            # 部分的にのみクローズされる
+                            self._reduce_trade(trade, price, need_size, time_index)
+                            need_size = 0
+
+                        if not need_size:
+                            break
+
+                # 注文をカバーするのに十分な流動性がない場合、ブローカーはそれをキャンセルする
+                if abs(need_size) * adjusted_price_plus_commission > \
+                        self.margin_available * self._leverage:
                     self.orders.remove(order)
                     continue
-            assert size == round(size)
-            need_size = int(size)
 
-            if not self._hedging:
-                # 既存の反対方向の取引をFIFOでクローズ/削減してポジションを埋める
-                # 既存の取引は調整価格でクローズされる（調整は購入時に既に行われているため）
-                for trade in list(self.trades):
-                    if trade.is_long == order.is_long:
-                        continue
-                    assert trade.size * order.size < 0
+                # 新しい取引を開始
+                if need_size:
+                    self._open_trade(order.code,
+                                    adjusted_price,
+                                    need_size,
+                                    order.sl,
+                                    order.tp,
+                                    time_index,
+                                    order.tag)
 
-                    # 注文サイズがこの反対方向の既存取引より大きい場合、
-                    # 完全にクローズされる
-                    if abs(need_size) >= abs(trade.size):
-                        self._close_trade(trade, price, time_index)
-                        need_size += trade.size
-                    else:
-                        # 既存の取引が新しい注文より大きい場合、
-                        # 部分的にのみクローズされる
-                        self._reduce_trade(trade, price, need_size, time_index)
-                        need_size = 0
+                    # 新しくキューに追加されたSL/TP注文を再処理する必要がある
+                    # これにより、注文が開かれた同じバーでSLがヒットすることを可能にする
+                    # https://github.com/kernc/backtesting.py/issues/119 を参照
+                    if order.sl or order.tp:
+                        if is_market_order:
+                            reprocess_orders = True
+                        # Order.stopとTPが同じバー内でヒットしたが、SLはヒットしなかった。この場合
+                        # ストップとTPが同じ価格方向に進むため、曖昧ではない
+                        elif stop_price and not order.limit and order.tp and (
+                                (order.is_long and order.tp <= high and (order.sl or -np.inf) < low) or
+                                (order.is_short and order.tp >= low and (order.sl or np.inf) > high)):
+                            reprocess_orders = True
+                        elif (low <= (order.sl or -np.inf) <= high or
+                            low <= (order.tp or -np.inf) <= high):
+                            warnings.warn(
+                                f"({df.index[-1]}) 条件付きSL/TP注文が、その親ストップ/リミット注文が取引に"
+                                "変換された同じバーで実行されることになります。"
+                                "正確なローソク足内価格変動を断言できないため、"
+                                "影響を受けるSL/TP注文は代わりに次の（マッチングする）価格/バーで"
+                                "実行され、結果（この取引の）が幾分疑わしいものになります。"
+                                "https://github.com/kernc/backtesting.py/issues/119 を参照",
+                                UserWarning)
 
-                    if not need_size:
-                        break
-
-            # 注文をカバーするのに十分な流動性がない場合、ブローカーはそれをキャンセルする
-            if abs(need_size) * adjusted_price_plus_commission > \
-                    self.margin_available * self._leverage:
+                # 注文処理完了
                 self.orders.remove(order)
-                continue
-
-            # 新しい取引を開始
-            if need_size:
-                self._open_trade(adjusted_price,
-                                 need_size,
-                                 order.sl,
-                                 order.tp,
-                                 time_index,
-                                 order.tag)
-
-                # 新しくキューに追加されたSL/TP注文を再処理する必要がある
-                # これにより、注文が開かれた同じバーでSLがヒットすることを可能にする
-                # https://github.com/kernc/backtesting.py/issues/119 を参照
-                if order.sl or order.tp:
-                    if is_market_order:
-                        reprocess_orders = True
-                    # Order.stopとTPが同じバー内でヒットしたが、SLはヒットしなかった。この場合
-                    # ストップとTPが同じ価格方向に進むため、曖昧ではない
-                    elif stop_price and not order.limit and order.tp and (
-                            (order.is_long and order.tp <= high and (order.sl or -np.inf) < low) or
-                            (order.is_short and order.tp >= low and (order.sl or np.inf) > high)):
-                        reprocess_orders = True
-                    elif (low <= (order.sl or -np.inf) <= high or
-                          low <= (order.tp or -np.inf) <= high):
-                        warnings.warn(
-                            f"({data.index[-1]}) 条件付きSL/TP注文が、その親ストップ/リミット注文が取引に"
-                            "変換された同じバーで実行されることになります。"
-                            "正確なローソク足内価格変動を断言できないため、"
-                            "影響を受けるSL/TP注文は代わりに次の（マッチングする）価格/バーで"
-                            "実行され、結果（この取引の）が幾分疑わしいものになります。"
-                            "https://github.com/kernc/backtesting.py/issues/119 を参照",
-                            UserWarning)
-
-            # 注文処理完了
-            self.orders.remove(order)
 
         if reprocess_orders:
             self._process_orders()
@@ -402,9 +413,9 @@ class _Broker:
         # by way of _reduce_trade()
         closed_trade._commissions = commission + trade_open_commission
 
-    def _open_trade(self, price: float, size: int,
+    def _open_trade(self, code: str, price: float, size: int,
                     sl: Optional[float], tp: Optional[float], time_index: int, tag):
-        trade = Trade(self, size, price, time_index, tag)
+        trade = Trade(self, code, size, price, time_index, tag)
         self.trades.append(trade)
         # Apply broker commission at trade open
         self._cash -= self._commission(size, price)

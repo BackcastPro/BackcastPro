@@ -23,6 +23,7 @@ class Order:
     """
     
     def __init__(self, broker: '_Broker',
+                 code: str,
                  size: float,
                  limit_price: Optional[float] = None,
                  stop_price: Optional[float] = None,
@@ -30,6 +31,7 @@ class Order:
                  tp_price: Optional[float] = None,
                  parent_trade: Optional['Trade'] = None,
                  tag: object = None):
+        self.__code = code
         self.__broker = broker
         assert size != 0
         self.__size = size
@@ -59,6 +61,13 @@ class Order:
                 pass  # Order placed by Trade.close()
 
     # Fields getters
+
+    @property
+    def code(self) -> str:
+        """
+        注文対象の銘柄コード。
+        """
+        return self.__code
 
     @property
     def size(self) -> float:
