@@ -63,6 +63,13 @@ class Order:
     # Fields getters
 
     @property
+    def code(self) -> str:
+        """
+        注文対象の銘柄コード。
+        """
+        return self.__code
+
+    @property
     def size(self) -> float:
         """
         注文サイズ（ショート注文の場合は負の値）。

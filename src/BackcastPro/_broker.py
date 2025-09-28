@@ -196,51 +196,59 @@ class _Broker:
         data = self._data
         reprocess_orders = False
 
-        for code, df in data.items():
+        # 注文を処理
+        for order in list(self.orders):  # type: Order
+
+            # 関連するSL/TP注文は既に削除されている
+            if order not in self.orders:
+                continue
+
+            # 注文の銘柄データを取得
+            if order.code not in data:
+                continue
+            df = data[order.code]
+            
+            # データの存在確認
+            if len(df) < 2:
+                continue
+                
             open, high, low = df.Open.iloc[-1], df.High.iloc[-1], df.Low.iloc[-1]
 
-            # 注文を処理
-            for order in list(self.orders):  # type: Order
-
-                # 関連するSL/TP注文は既に削除されている
-                if order not in self.orders:
+            # ストップ条件が満たされたかチェック
+            stop_price = order.stop
+            if stop_price:
+                is_stop_hit = ((high >= stop_price) if order.is_long else (low <= stop_price))
+                if not is_stop_hit:
                     continue
 
-                # ストップ条件が満たされたかチェック
-                stop_price = order.stop
+                # ストップ価格に達すると、ストップ注文は成行/指値注文になる
+                # https://www.sec.gov/fast-answers/answersstopordhtm.html
+                order._replace(stop_price=None)
+
+            # 購入価格を決定
+            # 指値注文が約定可能かチェック
+            if order.limit:
+                is_limit_hit = low <= order.limit if order.is_long else high >= order.limit
+                # ストップとリミットが同じバー内で満たされた場合、悲観的に
+                # リミットがストップより先に満たされたと仮定する（つまり「カウントされる前に」）
+                is_limit_hit_before_stop = (is_limit_hit and
+                                            (order.limit <= (stop_price or -np.inf)
+                                            if order.is_long
+                                            else order.limit >= (stop_price or np.inf)))
+                if not is_limit_hit or is_limit_hit_before_stop:
+                    continue
+
+                # stop_priceが設定されている場合、このバー内で満たされた
+                price = (min(stop_price or open, order.limit)
+                        if order.is_long else
+                        max(stop_price or open, order.limit))
+            else:
+                # 成行注文（Market-if-touched / market order）
+                # 条件付き注文は常に次の始値で
+                prev_close = df.Close.iloc[-2]
+                price = prev_close if self._trade_on_close and not order.is_contingent else open
                 if stop_price:
-                    is_stop_hit = ((high >= stop_price) if order.is_long else (low <= stop_price))
-                    if not is_stop_hit:
-                        continue
-
-                    # ストップ価格に達すると、ストップ注文は成行/指値注文になる
-                    # https://www.sec.gov/fast-answers/answersstopordhtm.html
-                    order._replace(stop_price=None)
-
-                # 購入価格を決定
-                # 指値注文が約定可能かチェック
-                if order.limit:
-                    is_limit_hit = low <= order.limit if order.is_long else high >= order.limit
-                    # ストップとリミットが同じバー内で満たされた場合、悲観的に
-                    # リミットがストップより先に満たされたと仮定する（つまり「カウントされる前に」）
-                    is_limit_hit_before_stop = (is_limit_hit and
-                                                (order.limit <= (stop_price or -np.inf)
-                                                if order.is_long
-                                                else order.limit >= (stop_price or np.inf)))
-                    if not is_limit_hit or is_limit_hit_before_stop:
-                        continue
-
-                    # stop_priceが設定されている場合、このバー内で満たされた
-                    price = (min(stop_price or open, order.limit)
-                            if order.is_long else
-                            max(stop_price or open, order.limit))
-                else:
-                    # 成行注文（Market-if-touched / market order）
-                    # 条件付き注文は常に次の始値で
-                    prev_close = df.Close.iloc[-2]
-                    price = prev_close if self._trade_on_close and not order.is_contingent else open
-                    if stop_price:
-                        price = max(price, stop_price) if order.is_long else min(price, stop_price)
+                    price = max(price, stop_price) if order.is_long else min(price, stop_price)
 
                 # エントリー/エグジットバーのインデックスを決定
                 is_market_order = not order.limit and not stop_price
@@ -277,7 +285,7 @@ class _Broker:
 
                 # 手数料（またはビッドアスクスプレッド）を含むように価格を調整
                 # ロングポジションでは調整価格が少し高くなり、その逆も同様
-                adjusted_price = self._adjusted_price(code=code, size=order.size, price=price)
+                adjusted_price = self._adjusted_price(code=order.code, size=order.size, price=price)
                 adjusted_price_plus_commission = \
                     adjusted_price + self._commission(order.size, price) / abs(order.size)
 

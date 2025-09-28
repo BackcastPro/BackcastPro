@@ -45,7 +45,7 @@ class Trade:
         # Ensure size is an int to avoid rounding errors on 32-bit OS
         size = copysign(max(1, int(round(abs(self.__size) * portion))), -self.__size)
         from .order import Order
-        order = Order(self.__code, self.__broker, size, parent_trade=self, tag=self.__tag)
+        order = Order(self.__broker, self.__code, size, parent_trade=self, tag=self.__tag)
         self.__broker.orders.insert(0, order)
 
     # Fields getters
