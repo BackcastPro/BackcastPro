@@ -5,7 +5,7 @@ sys.path.append('../../src')
 import pandas_datareader.data as web
 
 from BackcastPro import Strategy
-from SmaCross import crossover, calculate_rsi, calculate_atr
+from SmaCross import crossover, SMA
 from Streamlit import plot
 
 class SmaCross(Strategy):
@@ -17,12 +17,9 @@ class SmaCross(Strategy):
     def init(self):
         for code, df in self.data.items():
             # Precompute the two moving averages and add to data
-            df['SMA1'] = df.Close.rolling(self.n1).mean()
-            df['SMA2'] = df.Close.rolling(self.n2).mean()
+            df['SMA1'] = SMA(df.Close, self.n1)
+            df['SMA2'] = SMA(df.Close, self.n2)
             
-            # Calculate RSI and ATR for risk management and add to data
-            df['RSI'] = calculate_rsi(df)
-            df['ATR'] = calculate_atr(df)
     
     def next(self):
         for code, df in self.data.items():
@@ -47,9 +44,9 @@ bt = Backtest({code: df}, SmaCross, cash=10_000, commission=.002, finalize_trade
 stats = bt.run()
 print(stats)
 
-# Streamlit で表示
-page_title = os.path.splitext(os.path.basename(__file__))[0]
-plot(page_title, bt)
+# # Streamlit で表示
+# page_title = os.path.splitext(os.path.basename(__file__))[0]
+# plot(page_title, bt)
 
 
 
