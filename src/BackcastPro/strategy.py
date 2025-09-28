@@ -177,3 +177,8 @@ class Strategy(metaclass=ABCMeta):
     def closed_trades(self) -> 'Tuple[Trade, ...]':
         """決済済みトレードリスト（`Trade` を参照）。"""
         return tuple(self._broker.closed_trades)
+
+    @property
+    def progress(self) -> int:
+        """バックテスト中の進捗"""
+        return self._broker._i

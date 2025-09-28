@@ -6,7 +6,7 @@ import pandas_datareader.data as web
 
 from BackcastPro import Strategy
 from SmaCross import crossover, SMA
-from Streamlit import plot
+from Plotting import plot
 
 class SmaCross(Strategy):
     # Define the two MA lags as *class variables*
@@ -48,9 +48,12 @@ bt = Backtest({code: df}, SmaCross, cash=10_000, commission=.002, finalize_trade
 stats = bt.run()
 print(stats)
 
-# # Streamlit で表示
-# page_title = os.path.splitext(os.path.basename(__file__))[0]
-# plot(page_title, bt)
+
+# streamlit run で実行されている時のみ実行
+import streamlit as st
+if hasattr(st, '_is_running_with_streamlit') and st._is_running_with_streamlit:
+    page_title = os.path.splitext(os.path.basename(__file__))[0]
+    plot(page_title, bt)
 
 
 
