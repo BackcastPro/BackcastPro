@@ -175,7 +175,7 @@ class _Broker:
 
     def next(self):
         length = len(next(iter(self._data.values())))
-        i = self._i = length - 1
+        i = self._i = length - 1  # データスライスの最後のインデックス（現在のステップ）
         self._process_orders()
 
         # エクイティカーブ用にアカウントエクイティを記録

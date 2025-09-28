@@ -151,6 +151,7 @@ class Backtest:
                 warnings.warn(f'data[{code}] index is not sorted in ascending order. Sorting.',
                             stacklevel=2)
                 df = df.sort_index()
+                data[code] = df  # 重要：ソート後のDataFrameを辞書に再代入
             if not isinstance(df.index, pd.DatetimeIndex):
                 warnings.warn(f'data[{code}] index is not datetime. Assuming simple periods, '
                             'but `pd.DateTimeIndex` is advised.',
