@@ -48,7 +48,7 @@ from BackcastPro import Backtest
 code='7203.JP'
 df = web.DataReader(code, 'stooq')
 
-bt = Backtest({code: df}, SmaCross, cash=10_000, commission=.002, finalize_trades=False)
+bt = Backtest({code: df}, SmaCross, cash=10_000, commission=.002, finalize_trades=True)
 stats = bt.run()
 print(stats)
 
