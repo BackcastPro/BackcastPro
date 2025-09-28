@@ -63,6 +63,8 @@ def plot(page_title: str, bt: Backtest) -> None:
     st.subheader('成績サマリ')
     summary_df = pd.DataFrame(scalar_stats, index=[0]).T
     summary_df.columns = ['Value']
+    # すべての値を文字列に変換してPyArrowエラーを回避
+    summary_df['Value'] = summary_df['Value'].astype(str)
     st.table(summary_df)
 
     # エクイティカーブとドローダウン
