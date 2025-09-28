@@ -1,7 +1,9 @@
 import os
 from os.path import dirname, join
 import sys
-sys.path.append('../../src')
+# プロジェクトのルートフォルダをパスに追加
+project_root = os.path.abspath(os.path.join(os.path.dirname(__file__), '../../src'))
+sys.path.insert(0, project_root)
 
 import pandas as pd
 import pandas_datareader.data as web
