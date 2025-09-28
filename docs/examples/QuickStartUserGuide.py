@@ -1,6 +1,9 @@
 import os
 import sys
-sys.path.append('../../backtesting')
+
+# プロジェクトのルートフォルダをパスに追加
+project_root = os.path.abspath(os.path.join(os.path.dirname(__file__), '../..'))
+sys.path.insert(0, project_root)
 
 import pandas as pd
 
