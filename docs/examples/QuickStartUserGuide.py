@@ -19,11 +19,11 @@ class SmaCross(Strategy):
     def init(self):
         for code, df in self.data.items():
             # Precompute the two moving averages and add to data
-            df['SMA1'] = SMA(df.Close, self.n1)
-            df['SMA2'] = SMA(df.Close, self.n2)
+            df['sma1'] = SMA(df.Close, self.n1)
+            df['sma2'] = SMA(df.Close, self.n2)
             
     
-    def next(self):
+    def next(self, current_time):
 
         """
         このタイミングは、寄り付き前です。
@@ -34,17 +34,19 @@ class SmaCross(Strategy):
 
         for code, df in self.data.items():
             # 移動平均が有効な値を持つまでスキップ
-            if pd.isna(df.SMA1.iloc[-1]) or pd.isna(df.SMA2.iloc[-1]):
+            if pd.isna(df.sma1.iloc[-1]) or pd.isna(df.sma2.iloc[-1]):
                 continue
 
             # 5If sma1 crosses above sma2, close any existing
             # short trades, and buy the asset
-            if crossover(df.SMA1, df.SMA2):
+            if crossover(df.sma1, df.sma2):
+                self.position.close()
                 self.buy(code=code)
 
             # Else, if sma1 crosses below sma2, close any existing
             # long trades, and sell the asset
-            elif crossover(df.SMA2, df.SMA1):
+            elif crossover(df.sma2, df.sma1):
+                self.position.close()
                 self.sell(code=code)
 
 

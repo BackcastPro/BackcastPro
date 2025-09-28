@@ -18,14 +18,14 @@ class Trade:
     `Order`が約定されると、アクティブな`Trade`が発生します。
     アクティブな取引は`Strategy.trades`で、クローズされた決済済み取引は`Strategy.closed_trades`で見つけることができます。
     """
-    def __init__(self, broker: '_Broker', code: str, size: int, entry_price: float, entry_bar, tag):
+    def __init__(self, broker: '_Broker', code: str, size: int, entry_price: float, entry_time: Union[pd.Timestamp, int], tag):
         self.__broker = broker
         self.__code = code
         self.__size = size
         self.__entry_price = entry_price
         self.__exit_price: Optional[float] = None
-        self.__entry_bar: int = entry_bar
-        self.__exit_bar: Optional[int] = None
+        self.__entry_time: Union[pd.Timestamp, int] = entry_time
+        self.__exit_time: Optional[Union[pd.Timestamp, int]] = None
         self.__sl_order: Optional[Order] = None
         self.__tp_order: Optional[Order] = None
         self.__tag = tag
@@ -72,16 +72,59 @@ class Trade:
 
     @property
     def entry_bar(self) -> int:
-        """取引がエントリーされた時のローソク足バーのインデックス。"""
-        return self.__entry_bar
+        """
+        取引がエントリーされた時のローソク足バーのインデックス。
+        
+        .. deprecated:: 0.1.0
+            `entry_time`プロパティを使用してください。
+        """
+        import warnings
+        warnings.warn(
+            "entry_barプロパティは非推奨です。entry_timeプロパティを使用してください。",
+            DeprecationWarning,
+            stacklevel=2
+        )
+        # データからインデックスを逆算
+        try:
+            data_index = self.__broker._data[self.__code].index
+            return data_index.get_loc(self.__entry_time)
+        except (KeyError, TypeError):
+            # インデックスが見つからない場合は0を返す
+            return 0
 
     @property
     def exit_bar(self) -> Optional[int]:
         """
         取引がエグジットされた時のローソク足バーのインデックス
         （取引がまだアクティブな場合はNone）。
+        
+        .. deprecated:: 0.1.0
+            `exit_time`プロパティを使用してください。
         """
-        return self.__exit_bar
+        import warnings
+        warnings.warn(
+            "exit_barプロパティは非推奨です。exit_timeプロパティを使用してください。",
+            DeprecationWarning,
+            stacklevel=2
+        )
+        if self.__exit_time is None:
+            return None
+        try:
+            data_index = self.__broker._data[self.__code].index
+            return data_index.get_loc(self.__exit_time)
+        except (KeyError, TypeError):
+            # インデックスが見つからない場合はNoneを返す
+            return None
+
+    @property
+    def entry_time(self) -> Union[pd.Timestamp, int]:
+        """取引がエントリーされた日時。"""
+        return self.__entry_time
+
+    @property
+    def exit_time(self) -> Optional[Union[pd.Timestamp, int]]:
+        """取引がエグジットされた日時。"""
+        return self.__exit_time
 
     @property
     def tag(self):
@@ -103,19 +146,6 @@ class Trade:
         return self.__tp_order
 
     # Extra properties
-
-    @property
-    def entry_time(self) -> Union[pd.Timestamp, int]:
-        """取引がエントリーされた日時。"""
-        return self.__broker._data[self.__code].index[self.__entry_bar]
-
-    @property
-    def exit_time(self) -> Optional[Union[pd.Timestamp, int]]:
-        """取引がエグジットされた日時。"""
-        if self.__exit_bar is None:
-            return None
-            
-        return self.__broker._data[self.__code].index[self.__exit_bar]
 
     @property
     def is_long(self):

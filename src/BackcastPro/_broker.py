@@ -43,11 +43,9 @@ class _Broker:
         ヘッジングモードの有効化。Trueの場合、反対方向のポジションを同時に保有できます。
     exclusive_orders : bool
         排他的注文モード。Trueの場合、新しい注文が前のポジションを自動的にクローズします。
-    index : pd.Index
-        時系列データのインデックス。エクイティカーブの記録に使用されます。
     """
 
-    # Tips:
+    # ヒント:
     # 関数定義における`*`の意味
     # - `*`以降の引数は、必ずキーワード引数として渡す必要がある
     # - 位置引数として渡すことはできない
@@ -56,7 +54,7 @@ class _Broker:
     # 2. 保守性: 引数の順序を変更しても既存のコードが壊れない
     # 3. 可読性: 関数呼び出し時に何を渡しているかが分かりやすい
     def __init__(self, *, data, cash, spread, commission, margin,
-                 trade_on_close, hedging, exclusive_orders, index):
+                 trade_on_close, hedging, exclusive_orders):
         assert cash > 0, f"cash should be > 0, is {cash}"
         assert 0 < margin <= 1, f"margin should be between 0 and 1, is {margin}"
         self._data: dict[str, pd.DataFrame] = data
@@ -84,7 +82,8 @@ class _Broker:
         self._hedging = hedging
         self._exclusive_orders = exclusive_orders
 
-        self._equity = np.tile(np.nan, len(index))
+        self._equity = []
+        self._current_time = None
         self.orders: List[Order] = []
         self.trades: List[Trade] = []
         self.position = Position(self)
@@ -173,22 +172,21 @@ class _Broker:
     def commission(self):
         return self._commission
 
-    def next(self, index: int):
-        i = self._i = index - 1  # データスライスの最後のインデックス（現在のステップ）
+    def next(self, current_time: pd.Timestamp):
+        self._current_time = current_time
         self._process_orders()
 
         # エクイティカーブ用にアカウントエクイティを記録
         equity = self.equity
-        self._equity[i] = equity
+        self._equity.append(equity)
 
         # エクイティが負の場合、すべてを0に設定してシミュレーションを停止
         if equity <= 0:
             assert self.margin_available <= 0
             for trade in self.trades:
                 price = self._data[trade.code].Close.iloc[-1]
-                self._close_trade(trade, price, i)
+                self._close_trade(trade, price, self._current_time)
             self._cash = 0
-            # self._equity[i:] = 0
             raise Exception
 
     def _process_orders(self):
@@ -196,7 +194,7 @@ class _Broker:
         reprocess_orders = False
 
         # 注文を処理
-        for order in list(self.orders):  # type: Order
+        for order in list(self.orders):  # 型: Order
 
             # 関連するSL/TP注文は既に削除されている
             if order not in self.orders:
@@ -208,7 +206,7 @@ class _Broker:
             df = data[order.code]
             
             # データの存在確認
-            if len(df) < 2:
+            if len(df) == 0 or df.index[-1] != self._current_time:
                 continue
                 
             open, high, low = df.Open.iloc[-1], df.High.iloc[-1], df.Low.iloc[-1]
@@ -251,10 +249,6 @@ class _Broker:
 
                 # エントリー/エグジットバーのインデックスを決定
                 is_market_order = not order.limit and not stop_price
-                time_index = (
-                    (self._i - 1)
-                    if is_market_order and self._trade_on_close and not order.is_contingent else
-                    self._i)
 
                 # 注文がSL/TP注文の場合、それが依存していた既存の取引をクローズする必要がある
                 if order.parent_trade:
@@ -265,7 +259,7 @@ class _Broker:
                     size = copysign(min(abs(_prev_size), abs(order.size)), order.size)
                     # この取引がまだクローズされていない場合（例：複数の`trade.close(.5)`呼び出し）
                     if trade in self.trades:
-                        self._reduce_trade(trade, price, size, time_index)
+                        self._reduce_trade(trade, price, size, self._current_time)
                         assert order.size != -_prev_size or trade not in self.trades
                         if price == stop_price:
                             # 統計用にSLを注文に戻す
@@ -297,7 +291,7 @@ class _Broker:
                     # 単一ユニットでも十分な現金/マージンがない
                     if not size:
                         warnings.warn(
-                            f'time={self._i}: ブローカーは相対サイズの注文を'
+                            f'{self._current_time}: ブローカーは相対サイズの注文を'
                             f'不十分なマージンのためキャンセルしました。', category=UserWarning)
                         # XXX: 注文はブローカーによってキャンセルされる？
                         self.orders.remove(order)
@@ -316,12 +310,12 @@ class _Broker:
                         # 注文サイズがこの反対方向の既存取引より大きい場合、
                         # 完全にクローズされる
                         if abs(need_size) >= abs(trade.size):
-                            self._close_trade(trade, price, time_index)
+                            self._close_trade(trade, price, self._current_time)
                             need_size += trade.size
                         else:
                             # 既存の取引が新しい注文より大きい場合、
                             # 部分的にのみクローズされる
-                            self._reduce_trade(trade, price, need_size, time_index)
+                            self._reduce_trade(trade, price, need_size, self._current_time)
                             need_size = 0
 
                         if not need_size:
@@ -340,7 +334,7 @@ class _Broker:
                                     need_size,
                                     order.sl,
                                     order.tp,
-                                    time_index,
+                                    self._current_time,
                                     order.tag)
 
                     # 新しくキューに追加されたSL/TP注文を再処理する必要がある
@@ -372,7 +366,7 @@ class _Broker:
         if reprocess_orders:
             self._process_orders()
 
-    def _reduce_trade(self, trade: Trade, price: float, size: float, time_index: int):
+    def _reduce_trade(self, trade: Trade, price: float, size: float, current_time: pd.Timestamp):
         assert trade.size * size < 0
         assert abs(trade.size) >= abs(size)
 
@@ -381,44 +375,44 @@ class _Broker:
         if not size_left:
             close_trade = trade
         else:
-            # Reduce existing trade ...
+            # 既存の取引を削減...
             trade._replace(size=size_left)
             if trade._sl_order:
                 trade._sl_order._replace(size=-trade.size)
             if trade._tp_order:
                 trade._tp_order._replace(size=-trade.size)
 
-            # ... by closing a reduced copy of it
+            # ... その削減コピーをクローズすることによって
             close_trade = trade._copy(size=-size, sl_order=None, tp_order=None)
             self.trades.append(close_trade)
 
-        self._close_trade(close_trade, price, time_index)
+        self._close_trade(close_trade, price, current_time)
 
-    def _close_trade(self, trade: Trade, price: float, time_index: int):
+    def _close_trade(self, trade: Trade, price: float, current_time: pd.Timestamp):
         self.trades.remove(trade)
         if trade._sl_order:
             self.orders.remove(trade._sl_order)
         if trade._tp_order:
             self.orders.remove(trade._tp_order)
 
-        closed_trade = trade._replace(exit_price=price, exit_bar=time_index)
+        closed_trade = trade._replace(exit_price=price, exit_time=current_time)
         self.closed_trades.append(closed_trade)
-        # Apply commission one more time at trade exit
+        # 取引終了時に手数料を再度適用
         commission = self._commission(trade.size, price)
         self._cash += trade.pl - commission
-        # Save commissions on Trade instance for stats
+        # 統計用にTradeインスタンスに手数料を保存
         trade_open_commission = self._commission(closed_trade.size, closed_trade.entry_price)
-        # applied here instead of on Trade open because size could have changed
-        # by way of _reduce_trade()
+        # サイズが_reduce_trade()によって変更された可能性があるため、
+        # Trade開始時ではなくここで適用
         closed_trade._commissions = commission + trade_open_commission
 
     def _open_trade(self, code: str, price: float, size: int,
-                    sl: Optional[float], tp: Optional[float], time_index: int, tag):
-        trade = Trade(self, code, size, price, time_index, tag)
+                    sl: Optional[float], tp: Optional[float], current_time: pd.Timestamp, tag):
+        trade = Trade(self, code, size, price, current_time, tag)
         self.trades.append(trade)
-        # Apply broker commission at trade open
+        # 取引開始時にブローカー手数料を適用
         self._cash -= self._commission(size, price)
-        # Create SL/TP (bracket) orders.
+        # SL/TP（ブラケット）注文を作成。
         if tp:
             trade.tp = tp
         if sl:

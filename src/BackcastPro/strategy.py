@@ -59,7 +59,7 @@ class Strategy(metaclass=ABCMeta):
         """
 
     @abstractmethod
-    def next(self):
+    def next(self, current_time: pd.Timestamp):
         """
         メインのストラテジー実行メソッド。新しい
         `backtesting.backtesting.Strategy.data`

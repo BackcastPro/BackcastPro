@@ -157,6 +157,10 @@ class Backtest:
                             'but `pd.DateTimeIndex` is advised.',
                             stacklevel=2)
 
+        # 辞書dataに含まれる全てのdf.index一覧を作成
+        # df.indexが不一致の場合のために、どれかに固有値があれば抽出しておくため
+        self.index: pd.DatetimeIndex = pd.DatetimeIndex(sorted({idx for df in data.values() for idx in df.index}))
+
         self._data: dict[str, pd.DataFrame] = data
 
         # partialとは、関数の一部の引数を事前に固定して、新しい関数を作成します。
@@ -167,7 +171,7 @@ class Backtest:
         self._broker = partial(
             _Broker, cash=cash, spread=spread, commission=commission, margin=margin,
             trade_on_close=trade_on_close, hedging=hedging,
-            exclusive_orders=exclusive_orders, index=next(iter(data.values())).index,
+            exclusive_orders=exclusive_orders
         )
 
         self._strategy = strategy
@@ -236,45 +240,42 @@ class Backtest:
         # strategy.init()で加工されたdataを登録
         data = self._data.copy()
         
-        # インジケーターがまだ「ウォームアップ」中の最初の数本のキャンドルをスキップ
-        # 少なくとも2つのエントリが利用可能になるように+1
-        start = 1
-
         # "invalid value encountered in ..."警告を無効化。比較
         # np.nan >= 3は無効ではない；Falseです。
         with np.errstate(invalid='ignore'):
 
             # プログレスバーを表示
-            length = len(next(iter(self._data.values())))
-            progress_bar = tqdm(range(start, length), 
+            progress_bar = tqdm(self.index, 
                               desc="バックテスト実行中", 
                               unit="step",
                               ncols=120,
                               leave=True,
                               dynamic_ncols=True)
-            
-            for i in progress_bar:
+            count = 0
+            for current_time in progress_bar:
 
                 # 注文処理とブローカー関連の処理
-                data = {k: v.iloc[:i] for k, v in self._data.items()}
+                for k, value in self._data.items():
+                    # time以前のデータをフィルタリング
+                    data[k] = value[value.index <= current_time]
 
                 # brokerに更新したdateを再登録
                 try:
                     broker._data = data
-                    broker.next(i)
+                    broker.next(current_time)
                 except:
                     break
 
                 # 次のティック、バークローズ直前
                 strategy._data = data
-                strategy.next()
+                strategy.next(current_time)
                 
+                count += 1
+
                 # プログレスバーの説明を更新（現在の日付を表示）
-                index = next(iter(data.values())).index
-                if hasattr(index, 'strftime') and i > 0:
+                if data:
                     try:
-                        current_date = index[i-1].strftime('%Y-%m-%d')
-                        progress_bar.set_postfix({"日付": current_date})
+                        progress_bar.set_postfix({"日付": current_time.strftime('%Y-%m-%d')})
                     except:
                         pass
             else:
@@ -285,8 +286,7 @@ class Backtest:
 
                     # HACK: 最後の戦略イテレーションで配置されたクローズ注文を処理するために
                     #  ブローカーを最後にもう一度実行。最後のブローカーイテレーションと同じOHLC値を使用。
-                    if start < length:
-                        broker.next(length - 1)
+                    broker.next(self.index[count-1])
                 elif len(broker.trades):
                     warnings.warn(
                         'バックテスト終了時に一部の取引がオープンのままです。'
@@ -296,8 +296,8 @@ class Backtest:
             equity = pd.Series(broker._equity).bfill().fillna(broker._cash).values
             self._results = compute_stats(
                 trades=broker.closed_trades,
-                equity=equity,
-                ohlc_data=self._data,
+                equity=np.array(equity),
+                index=self.index,
                 strategy_instance=strategy,
                 risk_free_rate=0.0,
             )
