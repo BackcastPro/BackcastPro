@@ -294,10 +294,12 @@ class Backtest:
                         '統計に含めてください。', stacklevel=2)
 
             equity = pd.Series(broker._equity).bfill().fillna(broker._cash).values
+            # 統計計算のため、複数銘柄データから最初の銘柄データを抽出
+            primary_ohlc_data = next(iter(self._data.values()))
             self._results = compute_stats(
                 trades=broker.closed_trades,
                 equity=equity,
-                ohlc_data=self._data,
+                ohlc_data=primary_ohlc_data,
                 strategy_instance=strategy,
                 risk_free_rate=0.0,
             )

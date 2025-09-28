@@ -177,3 +177,8 @@ class Strategy(metaclass=ABCMeta):
     def closed_trades(self) -> 'Tuple[Trade, ...]':
         """決済済みトレードリスト（`Trade` を参照）。"""
         return tuple(self._broker.closed_trades)
+
+    @property
+    def progress(self):
+        # partialで初期化されている場合、初期化時のcash値を返す
+        return self._broker._i
