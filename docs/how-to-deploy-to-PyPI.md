@@ -5,13 +5,13 @@
 ### 1. 配布物をビルド
 
 ```powershell
-py -m build
+python -m build
 ```
 
 ### 2. PyPIへアップロード
 
 ```powershell
-py -m twine upload --repository pypi dist/*
+python -m twine upload --repository pypi dist/*
 ```
 
 アップロード時は PyPI の API トークン（`pypi-` で始まる値）を入力します。

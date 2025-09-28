@@ -7,7 +7,7 @@
 ### PyPIから（エンドユーザー向け）
 
 ```powershell
-py -m pip install BackcastPro
+python -m pip install BackcastPro
 ```
 
 ### 開発用インストール
@@ -17,13 +17,13 @@ py -m pip install BackcastPro
 ```powershell
 git clone <repository-url>
 cd BackcastPro
-py -m venv .venv
+python -m venv .venv
 .\.venv\Scripts\Activate.ps1
-py -m pip install -e .
-py -m pip install -r requirements.txt
+python -m pip install -e .
+python -m pip install -r requirements.txt
 ```
 
-**開発モードインストール（py -m pip install -e .）**
+**開発モードインストール（python -m pip install -e .）**
 - プロジェクトを開発モードでインストールします
 - `src` ディレクトリが自動的に Python パスに追加されます
 

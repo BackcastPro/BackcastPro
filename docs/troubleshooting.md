@@ -20,14 +20,14 @@ BackcastProを使用する際によく発生する問題とその解決方法を
 **解決方法:**
 ```powershell
 # PyPIから再インストール
-py -m pip install BackcastPro
+python -m pip install BackcastPro
 
 # または開発用インストール
 git clone <repository-url>
 cd BackcastPro
-py -m venv .venv
+python -m venv .venv
 .\.venv\Scripts\Activate.ps1
-py -m pip install -e .
+python -m pip install -e .
 ```
 
 ### 問題: `ImportError: cannot import name 'Strategy'`
@@ -37,10 +37,10 @@ py -m pip install -e .
 **解決方法:**
 ```powershell
 # 既存のインストールをアンインストール
-py -m pip uninstall BackcastPro -y
+python -m pip uninstall BackcastPro -y
 
 # 最新版を再インストール
-py -m pip install BackcastPro
+python -m pip install BackcastPro
 ```
 
 ### 問題: 依存関係の競合
@@ -50,11 +50,11 @@ py -m pip install BackcastPro
 **解決方法:**
 ```powershell
 # 仮想環境を作成（Windows）
-py -m venv backcastpro_env
+python -m venv backcastpro_env
 .\backcastpro_env\Scripts\Activate.ps1
 
 # クリーンな環境でインストール
-py -m pip install BackcastPro
+python -m pip install BackcastPro
 ```
 
 ## データ関連の問題

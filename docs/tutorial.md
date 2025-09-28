@@ -15,7 +15,7 @@ BackcastProを使ったバックテストの基本的な使い方を学びます
 ## インストール（Windows）
 
 ```powershell
-py -m pip install BackcastPro
+python -m pip install BackcastPro
 ```
 
 ## 基本的な使い方

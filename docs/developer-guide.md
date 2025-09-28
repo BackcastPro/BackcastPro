@@ -31,19 +31,19 @@ cd BackcastPro
 
 2. **仮想環境を作成**
 ```powershell
-py -m venv .venv
+python -m venv .venv
 .\.venv\Scripts\Activate.ps1
 ```
 
 3. **依存関係をインストール**
 ```powershell
-py -m pip install -e .
-py -m pip install -r requirements.txt
+python -m pip install -e .
+python -m pip install -r requirements.txt
 ```
 
 4. **開発用依存関係をインストール**
 ```powershell
-py -m pip install pytest pytest-cov black flake8 mypy
+python -m pip install pytest pytest-cov black flake8 mypy
 ```
 
 ### VS Code設定
@@ -254,16 +254,16 @@ tests/
 
 ```powershell
 # 全テストを実行
-py -m pytest
+python -m pytest
 
 # カバレッジ付きで実行
-py -m pytest --cov=BackcastPro
+python -m pytest --cov=BackcastPro
 
 # 特定のテストを実行
-py -m pytest tests/test_backtest.py
+python -m pytest tests/test_backtest.py
 
 # 詳細な出力で実行
-py -m pytest -v
+python -m pytest -v
 ```
 
 ### テストの書き方
@@ -445,18 +445,18 @@ version = "0.1.0"
 
 3. **テスト実行**
 ```powershell
-py -m pytest
-py -m pytest --cov=BackcastPro
+python -m pytest
+python -m pytest --cov=BackcastPro
 ```
 
 4. **ビルド**
 ```powershell
-py -m build
+python -m build
 ```
 
 5. **PyPIにアップロード**
 ```powershell
-py -m twine upload dist/*
+python -m twine upload dist/*
 ```
 
 6. **Gitタグ作成**
