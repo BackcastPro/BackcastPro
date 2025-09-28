@@ -26,6 +26,13 @@ class SmaCross(Strategy):
             # 長期移動平均が有効な値を持つまでスキップ
             return
 
+        """
+        このタイミングは、寄り付き前です。
+        日足データを扱う場合:
+        ここで注文を出したら、寄り付き(Open)から大引け(Close)まで
+        同じ注文が出されます。
+        """
+
         for code, df in self.data.items():
             # If sma1 crosses above sma2, close any existing
             # short trades, and buy the asset

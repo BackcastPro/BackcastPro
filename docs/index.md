@@ -13,6 +13,7 @@ BackcastProは、トレーディング戦略のためのPythonバックテスト
 ### 開発者向けドキュメント
 
 - **[開発者ガイド](developer-guide.md)** - 開発に参加するための情報
+- **[約定ロジック分析レポート](execution-logic-report.md)** - 売買約定時の価格決定ロジック詳細
 - **[PyPIへのデプロイ方法](how-to-deploy-to-PyPI.md)** - パッケージの配布方法
 
 ### サンプルコード
