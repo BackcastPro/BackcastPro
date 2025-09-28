@@ -20,6 +20,8 @@ py -m pip install BackcastPro
 
 ## 基本的な使い方
 
+BackcastProでは、バックテストの実行時に**TimeStomp管理**を使用して、各時点での戦略実行を行います。これにより、より正確な時系列での取引シミュレーションが可能になります。
+
 ```mermaid
 sequenceDiagram
     participant U as User
@@ -31,12 +33,18 @@ sequenceDiagram
     D-->>U: OHLCV DataFrame
     U->>B: Backtest({code: data}, Strategy)
     B->>S: init()
-    loop 各バー
-        B->>S: next()
+    loop 各タイムスタンプ
+        B->>S: next(current_time)
         S->>B: buy()/sell()
     end
     B-->>R: pd.Series（統計含む）
 ```
+
+### TimeStomp管理の特徴
+
+- **正確な時系列処理**: 各タイムスタンプで戦略を実行
+- **リアルタイム感覚**: 実際の取引に近いタイミングでの判断
+- **プログレスバー表示**: バックテストの進行状況を視覚的に確認
 
 ### 1. 必要なライブラリのインポート
 
@@ -66,7 +74,7 @@ class BuyAndHold(Strategy):
         # 戦略の初期化（今回は何もしない）
         pass
     
-    def next(self):
+    def next(self, current_time):
         # 最初のバーで一度だけ買い
         for code, df in self.data.items():
             if len(df) == 1:
@@ -210,7 +218,7 @@ class MovingAverageCross(Strategy):
             df['SMA_short'] = df.Close.rolling(10).mean()
             df['SMA_long'] = df.Close.rolling(20).mean()
     
-    def next(self):
+    def next(self, current_time):
         # ゴールデンクロスで買い、デッドクロスで売り
         for code, df in self.data.items():
             if (df.SMA_short.iloc[-1] > df.SMA_long.iloc[-1] and

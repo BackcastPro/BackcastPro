@@ -34,7 +34,7 @@ class BuyAndHold(Strategy):
     def init(self):
         pass
     
-    def next(self):
+    def next(self, current_time):
         for code, df in self.data.items():
             if len(df) == 1:
                 self.buy(code=code)
@@ -58,8 +58,8 @@ print(results)
 flowchart TD
     A[データ取得] --> B[Backtest 初期化]
     B --> C[Strategy.init 前処理]
-    C --> D[Strategy.next ループ]
-    D --> E[_Broker 注文/約定]
+    C --> D[Strategy.next(current_time) ループ]
+    D --> E[_Broker.next(current_time) 注文/約定]
     E --> F[_stats 統計計算]
     F --> G[結果 pd.Series]
 ```

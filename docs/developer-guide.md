@@ -117,9 +117,9 @@ BackcastPro/
    ↓
 3. バックテスト実行 (Backtest.run)
    ↓
-4. 各バーで戦略実行 (Strategy.next)
+4. 各タイムスタンプで戦略実行 (Strategy.next(current_time))
    ↓
-5. 注文処理 (_Broker.next)
+5. 注文処理 (_Broker.next(current_time))
    ↓
 6. 統計計算 (_stats.compute_stats)
    ↓
@@ -138,7 +138,7 @@ classDiagram
     
     class Strategy {
         +init()
-        +next()
+        +next(current_time)
         +buy() Order
         +sell() Order
     }
@@ -147,6 +147,7 @@ classDiagram
         +equity: float
         +position: Position
         +trades: List[Trade]
+        +next(current_time)
         +new_order() Order
     }
     
@@ -276,7 +277,7 @@ class TestStrategy(Strategy):
     def init(self):
         pass
     
-    def next(self):
+    def next(self, current_time):
         for code, df in self.data.items():
             if len(df) == 1:
                 self.buy(code=code)
@@ -312,7 +313,7 @@ def test_strategy_buy_sell():
     strategy._data = mock_data
     
     # 戦略を実行
-    strategy.next()
+    strategy.next(pd.Timestamp('2023-01-01'))
     
     # 結果を検証
     assert strategy.position.size > 0
@@ -338,7 +339,7 @@ def simple_strategy():
     class SimpleStrategy(Strategy):
         def init(self):
             pass
-        def next(self):
+        def next(self, current_time):
             if len(self.data) == 1:
                 self.buy()
     return SimpleStrategy

@@ -24,12 +24,14 @@ class SmaCross(Strategy):
             
     
     def next(self, current_time):
-
         """
         このタイミングは、寄り付き前です。
         日足データを扱う場合:
         ここで注文を出したら、寄り付き(Open)から大引け(Close)まで
         同じ注文が出されます。
+        
+        Args:
+            current_time: 現在のタイムスタンプ
         """
 
         for code, df in self.data.items():
@@ -66,10 +68,15 @@ print(stats)
 
 
 # streamlit run で実行されている時のみ実行
-import streamlit as st
-if hasattr(st, '_is_running_with_streamlit') and st._is_running_with_streamlit:
-    page_title = os.path.splitext(os.path.basename(__file__))[0]
-    plot(page_title, bt)
+try:
+    import streamlit as st
+    if st.runtime.exists():
+        page_title = os.path.splitext(os.path.basename(__file__))[0]
+        plot(page_title, bt)
+    else:
+        print("Streamlit環境で実行されていません。通常のPython実行です。")
+except ImportError:
+    print("Streamlitがインストールされていません。")
 
 
 
