@@ -22,6 +22,10 @@ class SmaCross(Strategy):
             
     
     def next(self):
+        if self.progress < self.n2:
+            # 長期移動平均が有効な値を持つまでスキップ
+            return
+
         for code, df in self.data.items():
             # If sma1 crosses above sma2, close any existing
             # short trades, and buy the asset
