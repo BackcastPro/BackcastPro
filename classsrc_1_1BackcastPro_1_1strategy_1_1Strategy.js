@@ -9,6 +9,7 @@ var classsrc_1_1BackcastPro_1_1strategy_1_1Strategy =
     [ "next", "classsrc_1_1BackcastPro_1_1strategy_1_1Strategy.html#aa877a9261be352af44e725afab113888", null ],
     [ "orders", "classsrc_1_1BackcastPro_1_1strategy_1_1Strategy.html#ac4376fa113cc2d1fb1eab9bb7ef320fb", null ],
     [ "position", "classsrc_1_1BackcastPro_1_1strategy_1_1Strategy.html#aa9a0f4de8a95fa2f95d53b698f909166", null ],
+    [ "progress", "classsrc_1_1BackcastPro_1_1strategy_1_1Strategy.html#a6c54cb0a3fe7842e878921f9abf123ed", null ],
     [ "sell", "classsrc_1_1BackcastPro_1_1strategy_1_1Strategy.html#a3876865999b85646f0b19f197181013a", null ],
     [ "trades", "classsrc_1_1BackcastPro_1_1strategy_1_1Strategy.html#a3fe7f46b3a7592adfc54c64b7e95a4c6", null ]
 ];
