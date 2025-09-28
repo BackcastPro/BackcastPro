@@ -17,7 +17,7 @@ def plot(page_title: str, bt: Backtest) -> None:
     st.title(f'{page_title} - Streamlit')
 
     stats = bt._results
-    code, df = bt._data.items()[0]
+    code, df = next(iter(bt._data.items()))
 
     with st.sidebar:
         st.header('設定')

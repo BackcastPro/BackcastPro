@@ -15,7 +15,7 @@ class SmaCross(Strategy):
     n2 = 20
     
     def init(self):
-        for code, df in self.data:
+        for code, df in self.data.items():
             # Precompute the two moving averages and add to data
             df['SMA1'] = df.Close.rolling(self.n1).mean()
             df['SMA2'] = df.Close.rolling(self.n2).mean()
@@ -25,7 +25,7 @@ class SmaCross(Strategy):
             df['ATR'] = calculate_atr(df)
     
     def next(self):
-        for code, df in self.data:
+        for code, df in self.data.items():
             # If sma1 crosses above sma2, close any existing
             # short trades, and buy the asset
             if crossover(df.SMA1, df.SMA2):
