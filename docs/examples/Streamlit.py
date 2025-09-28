@@ -17,8 +17,7 @@ def plot(page_title: str, bt: Backtest) -> None:
     st.title(f'{page_title} - Streamlit')
 
     stats = bt._results
-    data = bt._data
-    code = data['code'].iloc[0] if len(data) > 0 and 'code' in data.columns else ""
+    code, df = bt._data.items()[0]
 
     with st.sidebar:
         st.header('設定')
@@ -33,19 +32,19 @@ def plot(page_title: str, bt: Backtest) -> None:
         start_date = end_date - timedelta(days=365 * years)
 
         with st.spinner('データ取得中...'):
-            data = web.DataReader(code, 'stooq', start_date, end_date)
+            df = web.DataReader(code, 'stooq', start_date, end_date)
 
-        if data is None or len(data) == 0:
+        if df is None or len(df) == 0:
             st.error('データが取得できませんでした。コードや期間を確認してください。')
             st.stop()
 
-        bt = Backtest(data, bt._strategy, cash=cash, commission=commission)
+        bt = Backtest({code: df}, bt._strategy, cash=cash, commission=commission)
 
         with st.spinner('バックテスト実行中...'):
             stats = bt.run()
 
     st.subheader('価格データ（終値）')
-    st.line_chart(data[['Close']])
+    st.line_chart(df[['Close']])
 
     # 成績表（Backtesting.pyの出力に相当）
     excluded = {'_strategy', '_equity_curve', '_trades'}
@@ -78,9 +77,9 @@ def plot(page_title: str, bt: Backtest) -> None:
 
     # 価格にエントリー/エグジットを重ねた簡易可視化
     st.subheader('価格とエントリー（簡易）')
-    close = data['Close'].rename('Close')
-    buy_points = pd.Series(index=data.index, dtype=float, name='Buy')
-    sell_points = pd.Series(index=data.index, dtype=float, name='Sell')
+    close = df['Close'].rename('Close')
+    buy_points = pd.Series(index=df.index, dtype=float, name='Buy')
+    sell_points = pd.Series(index=df.index, dtype=float, name='Sell')
     for row in trades_df.itertuples(index=False):
         if pd.notna(row.EntryTime):
             if row.Size > 0:
