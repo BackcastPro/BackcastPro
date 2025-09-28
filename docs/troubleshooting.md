@@ -61,6 +61,23 @@ py -m pip install BackcastPro
 
 ### 問題: `ValueError: data must be a pandas.DataFrame with columns`
 
+**原因:** データが辞書形式でない、またはDataFrameでない
+
+**解決方法:**
+```python
+# 正しい形式: 辞書で銘柄コードをキーとしてDataFrameを渡す
+data = {
+    '7203.JP': toyota_data,
+    '6758.JP': sony_data
+}
+bt = Backtest(data, MyStrategy)
+
+# 単一銘柄の場合も辞書形式で渡す
+bt = Backtest({'7203.JP': toyota_data}, MyStrategy)
+```
+
+### 問題: `ValueError: data must be a pandas.DataFrame with columns` (旧形式)
+
 **原因:** データがDataFrameでない、または必要な列がない
 
 **解決方法:**
@@ -180,12 +197,14 @@ class WrongStrategy:  # Strategyを継承していない
 class MyStrategy(Strategy):
     def init(self):
         # 正しい: self.dataを使用
-        self.data['SMA'] = self.data.Close.rolling(20).mean()
+        for code, df in self.data.items():
+            df['SMA'] = df.Close.rolling(20).mean()
     
     def next(self):
         # 正しい: self.dataを使用
-        if self.data.SMA.iloc[-1] > self.data.Close.iloc[-1]:
-            self.buy()
+        for code, df in self.data.items():
+            if df.SMA.iloc[-1] > df.Close.iloc[-1]:
+                self.buy(code=code)
 ```
 
 ### 問題: 戦略が動作しない
@@ -201,13 +220,14 @@ class DebugStrategy(Strategy):
         print("データ列:", self.data.columns.tolist())
     
     def next(self):
-        print(f"現在のバー: {len(self.data)}")
-        print(f"現在の終値: {self.data.Close.iloc[-1]}")
-        
-        # デバッグ情報を出力
-        if len(self.data) % 100 == 0:  # 100バーごとに出力
-            print(f"エクイティ: {self.equity}")
-            print(f"ポジション: {self.position.size}")
+        for code, df in self.data.items():
+            print(f"現在のバー: {len(df)}")
+            print(f"現在の終値: {df.Close.iloc[-1]}")
+            
+            # デバッグ情報を出力
+            if len(df) % 100 == 0:  # 100バーごとに出力
+                print(f"エクイティ: {self.equity}")
+                print(f"ポジション: {self.position.size}")
 ```
 
 ## バックテスト実行の問題
@@ -248,14 +268,15 @@ class SimpleStrategy(Strategy):
         pass
     
     def next(self):
-        if len(self.data) == 1:
-            self.buy()
-            return
+        for code, df in self.data.items():
+            if len(df) == 1:
+                self.buy(code=code)
+                return
 
 # 3. 長時間実行を避けるためにデータ期間を短くする
 data = data.tail(2000)
 
-bt = Backtest(data, SimpleStrategy)
+bt = Backtest({'TEST': data}, SimpleStrategy)
 results = bt.run()
 ```
 
@@ -278,16 +299,17 @@ class LoggingStrategy(Strategy):
     
     def next(self):
         # 取引ログを記録
-        if len(self.data) == 1:
-            self.buy()
-            self.trades.append(('BUY', self.data.Close.iloc[-1]))
-        
-        # 定期的にログを出力
-        if len(self.data) % 100 == 0:
-            print(f"バー {len(self.data)}: エクイティ {self.equity}")
+        for code, df in self.data.items():
+            if len(df) == 1:
+                self.buy(code=code)
+                self.trades.append(('BUY', df.Close.iloc[-1]))
+            
+            # 定期的にログを出力
+            if len(df) % 100 == 0:
+                print(f"バー {len(df)}: エクイティ {self.equity}")
 
 # 3. パラメータを確認
-bt = Backtest(data, LoggingStrategy, cash=10000, commission=0.001)
+bt = Backtest({'TEST': data}, LoggingStrategy, cash=10000, commission=0.001)
 print("バックテストパラメータ:")
 print(f"初期資金: {bt._cash}")
 print(f"手数料: {bt._commission}")
@@ -308,13 +330,15 @@ data = data.tail(1000)  # 最新1000バーのみ使用
 class OptimizedStrategy(Strategy):
     def init(self):
         # 事前計算でパフォーマンスを向上
-        self.data['SMA'] = self.data.Close.rolling(20).mean()
-        self.data['RSI'] = calculate_rsi(self.data)
+        for code, df in self.data.items():
+            df['SMA'] = df.Close.rolling(20).mean()
+            df['RSI'] = calculate_rsi(df)
     
     def next(self):
         # 事前計算された値を参照
-        if self.data.SMA.iloc[-1] > self.data.Close.iloc[-1]:
-            self.buy()
+        for code, df in self.data.items():
+            if df.SMA.iloc[-1] > df.Close.iloc[-1]:
+                self.buy(code=code)
 
 # 3. 不要な計算を削除
 class SimpleStrategy(Strategy):
@@ -324,8 +348,9 @@ class SimpleStrategy(Strategy):
     
     def next(self):
         # シンプルなロジック
-        if len(self.data) == 1:
-            self.buy()
+        for code, df in self.data.items():
+            if len(df) == 1:
+                self.buy(code=code)
 ```
 
 ### 問題: メモリ使用量が大きい
@@ -350,7 +375,7 @@ data = data[['Open', 'High', 'Low', 'Close', 'Volume']]
 chunk_size = 1000
 for i in range(0, len(data), chunk_size):
     chunk = data.iloc[i:i+chunk_size]
-    bt = Backtest(chunk, MyStrategy)
+    bt = Backtest({'CHUNK': chunk}, MyStrategy)
     results = bt.run()
 ```
 
@@ -390,14 +415,15 @@ class DebugStrategy(Strategy):
         print("戦略初期化")
     
     def next(self):
-        if len(self.data) % 100 == 0:
-            print(f"バー {len(self.data)}: エクイティ {self.equity}")
+        for code, df in self.data.items():
+            if len(df) % 100 == 0:
+                print(f"バー {len(df)}: エクイティ {self.equity}")
 ```
 
 4. **エラーハンドリングを追加する**
 ```python
 try:
-    bt = Backtest(data, MyStrategy)
+    bt = Backtest({'TEST': data}, MyStrategy)
     results = bt.run()
 except Exception as e:
     print(f"エラー: {e}")

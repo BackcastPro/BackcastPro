@@ -131,7 +131,7 @@ BackcastPro/
 ```mermaid
 classDiagram
     class Backtest {
-        +data: DataFrame
+        +data: dict[str, DataFrame]
         +strategy: Strategy
         +run() Series
     }
@@ -277,8 +277,9 @@ class TestStrategy(Strategy):
         pass
     
     def next(self):
-        if len(self.data) == 1:
-            self.buy()
+        for code, df in self.data.items():
+            if len(df) == 1:
+                self.buy(code=code)
 
 def test_backtest_basic():
     """基本的なバックテストのテスト"""
@@ -292,7 +293,7 @@ def test_backtest_basic():
     }, index=pd.date_range('2023-01-01', periods=3))
     
     # バックテストを実行
-    bt = Backtest(data, TestStrategy, cash=10000)
+    bt = Backtest({'TEST': data}, TestStrategy, cash=10000)
     results = bt.run()
     
     # 結果を検証

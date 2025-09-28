@@ -34,12 +34,14 @@ class BuyAndHold(Strategy):
         pass
     
     def next(self):
-        if len(self.data) == 1:
-            self.buy()
+        for code, df in self.data.items():
+            if len(df) == 1:
+                self.buy(code=code)
 
 # データを取得してバックテストを実行
-data = web.DataReader('7203.JP', 'stooq')  # トヨタ
-bt = Backtest(data, BuyAndHold, cash=10000)
+code='7203.JP' # トヨタ
+df = web.DataReader(code, 'stooq')
+bt = Backtest({code: df}, BuyAndHold, cash=10000)
 results = bt.run()
 print(results)
 ```

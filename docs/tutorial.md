@@ -29,7 +29,7 @@ sequenceDiagram
     participant R as Results
     U->>D: DataReader('7203.JP', 'stooq')
     D-->>U: OHLCV DataFrame
-    U->>B: Backtest(data, Strategy)
+    U->>B: Backtest({code: data}, Strategy)
     B->>S: init()
     loop 各バー
         B->>S: next()
@@ -49,8 +49,9 @@ import pandas as pd
 
 ```python
 # トヨタの株価データを取得
-data = web.DataReader('7203.JP', 'stooq')
-print(data.head())
+code='7203.JP'
+df = web.DataReader(code, 'stooq')
+print(df.head())
 ```
 
 ## 最初の戦略
@@ -67,15 +68,16 @@ class BuyAndHold(Strategy):
     
     def next(self):
         # 最初のバーで一度だけ買い
-        if len(self.data) == 1:
-            self.buy()
+        for code, df in self.data.items():
+            if len(df) == 1:
+                self.buy(code=code)
 ```
 
 ### バックテストの実行
 
 ```python
 # バックテストを実行
-bt = Backtest(data, BuyAndHold, cash=10000, commission=0.001)
+bt = Backtest({code: data}, BuyAndHold, cash=10000, commission=0.001)
 results = bt.run()
 print(results)
 ```
@@ -115,7 +117,24 @@ custom_data = pd.DataFrame({
 }, index=pd.date_range('2023-01-01', periods=5))
 
 # バックテストで使用
-bt = Backtest(custom_data, BuyAndHold)
+bt = Backtest({'CUSTOM': custom_data}, BuyAndHold)
+results = bt.run()
+```
+
+### 複数銘柄の同時バックテスト
+
+```python
+# 複数の銘柄データを取得
+toyota_data = web.DataReader('7203.JP', 'stooq')
+sony_data = web.DataReader('6758.JP', 'stooq')
+
+# 複数銘柄でバックテストを実行
+multi_data = {
+    '7203.JP': toyota_data,
+    '6758.JP': sony_data
+}
+
+bt = Backtest(multi_data, BuyAndHold, cash=10000)
 results = bt.run()
 ```
 
@@ -123,7 +142,7 @@ results = bt.run()
 
 ```python
 bt = Backtest(
-    data,
+    {code: data},
     BuyAndHold,
     cash=10000,
     commission=0.001,
@@ -187,18 +206,20 @@ print(f"平均負け: {losing_trades['PnL'].mean():.2f}")
 class MovingAverageCross(Strategy):
     def init(self):
         # 移動平均を計算
-        self.data['SMA_short'] = self.data.Close.rolling(10).mean()
-        self.data['SMA_long'] = self.data.Close.rolling(20).mean()
+        for code, df in self.data.items():
+            df['SMA_short'] = df.Close.rolling(10).mean()
+            df['SMA_long'] = df.Close.rolling(20).mean()
     
     def next(self):
         # ゴールデンクロスで買い、デッドクロスで売り
-        if (self.data.SMA_short.iloc[-1] > self.data.SMA_long.iloc[-1] and
-            self.data.SMA_short.iloc[-2] <= self.data.SMA_long.iloc[-2]):
-            self.buy()
-        
-        elif (self.data.SMA_short.iloc[-1] < self.data.SMA_long.iloc[-1] and
-              self.data.SMA_short.iloc[-2] >= self.data.SMA_long.iloc[-2]):
-            self.sell()
+        for code, df in self.data.items():
+            if (df.SMA_short.iloc[-1] > df.SMA_long.iloc[-1] and
+                df.SMA_short.iloc[-2] <= df.SMA_long.iloc[-2]):
+                self.buy(code=code)
+            
+            elif (df.SMA_short.iloc[-1] < df.SMA_long.iloc[-1] and
+                  df.SMA_short.iloc[-2] >= df.SMA_long.iloc[-2]):
+                self.sell(code=code)
 ```
 
 ### 2. リスク管理の追加
