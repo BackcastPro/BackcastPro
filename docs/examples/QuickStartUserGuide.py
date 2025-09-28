@@ -1,7 +1,9 @@
+from math import nan
 import os
 import sys
 sys.path.append(os.path.join(os.path.dirname(__file__), '..', '..', 'src'))
 
+import pandas as pd
 import pandas_datareader.data as web
 
 from BackcastPro import Strategy
@@ -22,9 +24,6 @@ class SmaCross(Strategy):
             
     
     def next(self):
-        if self.progress < self.n2:
-            # 長期移動平均が有効な値を持つまでスキップ
-            return
 
         """
         このタイミングは、寄り付き前です。
@@ -34,7 +33,11 @@ class SmaCross(Strategy):
         """
 
         for code, df in self.data.items():
-            # If sma1 crosses above sma2, close any existing
+            # 移動平均が有効な値を持つまでスキップ
+            if pd.isna(df.SMA1.iloc[-1]) or pd.isna(df.SMA2.iloc[-1]):
+                continue
+
+            # 5If sma1 crosses above sma2, close any existing
             # short trades, and buy the asset
             if crossover(df.SMA1, df.SMA2):
                 self.buy(code=code)
@@ -48,10 +51,14 @@ class SmaCross(Strategy):
 # データ取得とバックテスト実行
 from BackcastPro import Backtest
 
-# データ取得（例: トヨタ 7203）
-code='7203.JP'
-df = web.DataReader(code, 'stooq')
-bt = Backtest({code: df}, SmaCross, cash=10_000, commission=.002, finalize_trades=True)
+# データ取得
+TOYOTA = '7203.JP'  # トヨタ
+SONY = '6758.JP'    # ソニー
+target = {
+    TOYOTA: web.DataReader(TOYOTA, 'stooq'),
+    SONY: web.DataReader(SONY, 'stooq')    
+}
+bt = Backtest(target, SmaCross, cash=10_000, commission=.002, finalize_trades=True)
 stats = bt.run()
 print(stats)
 

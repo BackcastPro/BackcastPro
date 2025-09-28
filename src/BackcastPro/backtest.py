@@ -261,7 +261,7 @@ class Backtest:
                 # brokerに更新したdateを再登録
                 try:
                     broker._data = data
-                    broker.next()
+                    broker.next(i)
                 except:
                     break
 
@@ -286,7 +286,7 @@ class Backtest:
                     # HACK: 最後の戦略イテレーションで配置されたクローズ注文を処理するために
                     #  ブローカーを最後にもう一度実行。最後のブローカーイテレーションと同じOHLC値を使用。
                     if start < length:
-                        broker.next()
+                        broker.next(length - 1)
                 elif len(broker.trades):
                     warnings.warn(
                         'バックテスト終了時に一部の取引がオープンのままです。'

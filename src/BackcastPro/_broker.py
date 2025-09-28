@@ -173,9 +173,8 @@ class _Broker:
     def commission(self):
         return self._commission
 
-    def next(self):
-        length = len(next(iter(self._data.values())))
-        i = self._i = length - 1  # データスライスの最後のインデックス（現在のステップ）
+    def next(self, index: int):
+        i = self._i = index - 1  # データスライスの最後のインデックス（現在のステップ）
         self._process_orders()
 
         # エクイティカーブ用にアカウントエクイティを記録
@@ -189,7 +188,7 @@ class _Broker:
                 price = self._data[trade.code].Close.iloc[-1]
                 self._close_trade(trade, price, i)
             self._cash = 0
-            self._equity[i:] = 0
+            # self._equity[i:] = 0
             raise Exception
 
     def _process_orders(self):
