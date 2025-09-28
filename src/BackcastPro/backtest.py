@@ -105,19 +105,18 @@ class Backtest:
                             'or a function that takes `(order_size, price)`'
                             'and returns commission dollar value')
 
-        k0, v0 = data.items()[0]
+        k0, v0 = next(iter(data.items()))
         len0 = len(v0)
-        for k, v in data.items()[1:]:
+        for k, v in list(data.items())[1:]:
             if not len0 == len(v):
                 raise TypeError(f"`data[{k}]` 数が、{k0}と合致していません。")
 
 
-        data = data.copy(deep=False)
+        data = data.copy()
 
-        for key in data:
-            df = data[key]
+        for code, df in data.items():
             if not isinstance(df, pd.DataFrame):
-                raise TypeError(f"`data[{key}]` must be a pandas.DataFrame with columns")
+                raise TypeError(f"`data[{code}]` must be a pandas.DataFrame with columns")
 
             # インデックスをdatetimeインデックスに変換
             if (not isinstance(df.index, pd.DatetimeIndex) and
@@ -134,9 +133,9 @@ class Backtest:
                 df['Volume'] = np.nan
 
             if len(df) == 0:
-                raise ValueError(f'OHLC `data[{key}]` is empty')
+                raise ValueError(f'OHLC `data[{code}]` is empty')
             if len(df.columns.intersection({'Open', 'High', 'Low', 'Close', 'Volume'})) != 5:
-                raise ValueError(f"`data[{key}]` must be a pandas.DataFrame with columns "
+                raise ValueError(f"`data[{code}]` must be a pandas.DataFrame with columns "
                                 "'Open', 'High', 'Low', 'Close', and (optionally) 'Volume'")
             if df[['Open', 'High', 'Low', 'Close']].isnull().values.any():
                 raise ValueError('Some OHLC values are missing (NaN). '
@@ -149,11 +148,11 @@ class Backtest:
                             '`backtesting.lib.FractionalBacktest`.',
                             stacklevel=2)
             if not df.index.is_monotonic_increasing:
-                warnings.warn(f'data[{key}] index is not sorted in ascending order. Sorting.',
+                warnings.warn(f'data[{code}] index is not sorted in ascending order. Sorting.',
                             stacklevel=2)
                 df = df.sort_index()
             if not isinstance(df.index, pd.DatetimeIndex):
-                warnings.warn(f'data[{key}] index is not datetime. Assuming simple periods, '
+                warnings.warn(f'data[{code}] index is not datetime. Assuming simple periods, '
                             'but `pd.DateTimeIndex` is advised.',
                             stacklevel=2)
 
@@ -234,7 +233,7 @@ class Backtest:
         strategy.init()
 
         # strategy.init()で加工されたdataを登録
-        data = self._data.copy(deep=False)
+        data = self._data.copy()
         
         # インジケーターがまだ「ウォームアップ」中の最初の数本のキャンドルをスキップ
         # 少なくとも2つのエントリが利用可能になるように+1

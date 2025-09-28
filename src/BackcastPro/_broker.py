@@ -114,7 +114,7 @@ class _Broker:
 
         is_long = size > 0
         assert size != 0, size
-        adjusted_price = self._adjusted_price(size)
+        adjusted_price = self._adjusted_price(code, size)
 
         if is_long:
             if not (sl or -np.inf) < (limit or stop or adjusted_price) < (tp or np.inf):
@@ -144,8 +144,7 @@ class _Broker:
 
         return order
 
-    @property
-    def last_price(self, code: str) -> dict[str, float]:
+    def last_price(self, code: str) -> float:
         """ Price at the last (current) close. """
         return self._data[code].Close.iloc[-1]
 
@@ -329,7 +328,8 @@ class _Broker:
 
                 # 新しい取引を開始
                 if need_size:
-                    self._open_trade(adjusted_price,
+                    self._open_trade(order.code,
+                                    adjusted_price,
                                     need_size,
                                     order.sl,
                                     order.tp,
@@ -405,9 +405,9 @@ class _Broker:
         # by way of _reduce_trade()
         closed_trade._commissions = commission + trade_open_commission
 
-    def _open_trade(self, price: float, size: int,
+    def _open_trade(self, code: str, price: float, size: int,
                     sl: Optional[float], tp: Optional[float], time_index: int, tag):
-        trade = Trade(self, size, price, time_index, tag)
+        trade = Trade(self, code, size, price, time_index, tag)
         self.trades.append(trade)
         # Apply broker commission at trade open
         self._cash -= self._commission(size, price)

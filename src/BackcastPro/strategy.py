@@ -36,12 +36,12 @@ class Strategy(metaclass=ABCMeta):
     オーバーライドして独自の戦略を定義してください。
     """
     
-    def __init__(self, broker: _Broker, data: pd.DataFrame):
+    def __init__(self, broker: _Broker, data: dict[str, pd.DataFrame]):
         """
         これは Backtestクラスで初期化するためユーザーは不要
         """
         self._broker: _Broker = broker
-        self._data: pd.DataFrame = data
+        self._data: dict[str, pd.DataFrame] = data
 
 
     @abstractmethod
@@ -152,7 +152,7 @@ class Strategy(metaclass=ABCMeta):
         return self._broker.equity
 
     @property
-    def data(self) -> pd.DataFrame:
+    def data(self) -> dict[str, pd.DataFrame]:
         """
         価格データは、`Backtest.__init__`に渡されるものと同じ
         """

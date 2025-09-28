@@ -133,13 +133,13 @@ class Trade:
         取引の利益（正の値）または損失（負の値）を現金単位で表示。
         手数料は取引がクローズされた後にのみ反映されます。
         """
-        price = self.__exit_price or self.__broker.last_price
+        price = self.__exit_price or self.__broker.last_price(self.__code)
         return (self.__size * (price - self.__entry_price)) - self._commissions
 
     @property
     def pl_pct(self):
         """取引の利益（正の値）または損失（負の値）をパーセントで表示。"""
-        price = self.__exit_price or self.__broker.last_price
+        price = self.__exit_price or self.__broker.last_price(self.__code)
         gross_pl_pct = copysign(1, self.__size) * (price / self.__entry_price - 1)
 
         # 取引全体のサイズに対する手数料を個別単位に換算
@@ -149,7 +149,7 @@ class Trade:
     @property
     def value(self):
         """取引の総価値を現金単位で表示（ボリューム × 価格）。"""
-        price = self.__exit_price or self.__broker.last_price
+        price = self.__exit_price or self.__broker.last_price(self.__code)
         return abs(self.__size) * price
 
     # SL/TP management API
