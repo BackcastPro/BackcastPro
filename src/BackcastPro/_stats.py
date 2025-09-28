@@ -168,16 +168,5 @@ def compute_stats(
     s.loc['_equity_curve'] = equity_df
     s.loc['_trades'] = trades_df
 
-    s = _Stats(s)
     return s
 
-
-class _Stats(pd.Series):
-    def __repr__(self):
-        with pd.option_context(
-            'display.max_colwidth', 20,  # Prevent expansion due to _equity and _trades dfs
-            'display.max_rows', len(self),  # Reveal self whole
-            'display.precision', 5,  # Enough for my eyes at least
-            # 'format.na_rep', '--',  # TODO: Enable once it works
-        ):
-            return super().__repr__()
