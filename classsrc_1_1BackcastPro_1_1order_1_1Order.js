@@ -1,8 +1,9 @@
 var classsrc_1_1BackcastPro_1_1order_1_1Order =
 [
-    [ "__init__", "classsrc_1_1BackcastPro_1_1order_1_1Order.html#a2d8f9c2e9275aa9d577bbb9e2b2c0af3", null ],
+    [ "__init__", "classsrc_1_1BackcastPro_1_1order_1_1Order.html#a2e95216e30e5eee8dc224e3c81cf1222", null ],
     [ "_replace", "classsrc_1_1BackcastPro_1_1order_1_1Order.html#a6d5287f433f44ed91bf705385a9668df", null ],
     [ "cancel", "classsrc_1_1BackcastPro_1_1order_1_1Order.html#adfd76af5055550e4989c4bd07f828785", null ],
+    [ "code", "classsrc_1_1BackcastPro_1_1order_1_1Order.html#aec5e7f54ba53a7c7dab48cf6e12e164e", null ],
     [ "is_contingent", "classsrc_1_1BackcastPro_1_1order_1_1Order.html#a01ec9a37f6fc7c7ff0c510404d7527bc", null ],
     [ "is_long", "classsrc_1_1BackcastPro_1_1order_1_1Order.html#aed3e6980f5005f7d1098e3e0d693237e", null ],
     [ "is_short", "classsrc_1_1BackcastPro_1_1order_1_1Order.html#ad3ffb06d2d9649379535aaea03a6453f", null ],

@@ -5,7 +5,7 @@ var indexSectionsWithContent =
   2: "s",
   3: "_bopst",
   4: "_bcdegilmnoprstv",
-  5: "_lopt"
+  5: "_opt"
 };
 
 var indexSectionNames =

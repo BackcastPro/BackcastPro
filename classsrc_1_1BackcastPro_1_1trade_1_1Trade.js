@@ -1,12 +1,12 @@
 var classsrc_1_1BackcastPro_1_1trade_1_1Trade =
 [
-    [ "__init__", "classsrc_1_1BackcastPro_1_1trade_1_1Trade.html#aff9de8a919c873707ef516574ad2149b", null ],
-    [ "__repr__", "classsrc_1_1BackcastPro_1_1trade_1_1Trade.html#adc95fa4cf9f42eec38aeff27bb97dad9", null ],
+    [ "__init__", "classsrc_1_1BackcastPro_1_1trade_1_1Trade.html#a1146a6bb8b7648cd3ab26481396e4f16", null ],
     [ "_copy", "classsrc_1_1BackcastPro_1_1trade_1_1Trade.html#a72bcb72e0067f3916e2930ca89ae7caa", null ],
     [ "_replace", "classsrc_1_1BackcastPro_1_1trade_1_1Trade.html#a4dc6d033170064fca56e2855191f802a", null ],
     [ "_sl_order", "classsrc_1_1BackcastPro_1_1trade_1_1Trade.html#af31322fd766af5aaf9aa58521f53037d", null ],
     [ "_tp_order", "classsrc_1_1BackcastPro_1_1trade_1_1Trade.html#a49d0760f145e77e5907ddee24697b54e", null ],
     [ "close", "classsrc_1_1BackcastPro_1_1trade_1_1Trade.html#a1cfaa90e147944801f9cda18aaecd886", null ],
+    [ "code", "classsrc_1_1BackcastPro_1_1trade_1_1Trade.html#a25b146650ae1ced122ff62a389f95029", null ],
     [ "entry_bar", "classsrc_1_1BackcastPro_1_1trade_1_1Trade.html#a26395e51bcea549f8251613da6e01cf3", null ],
     [ "entry_price", "classsrc_1_1BackcastPro_1_1trade_1_1Trade.html#ad43619bfb8767d61d73a2e876626a8dd", null ],
     [ "entry_time", "classsrc_1_1BackcastPro_1_1trade_1_1Trade.html#a92390e52d79fb633216267aa3f0917aa", null ],
